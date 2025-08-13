@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/dsp/Sine.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -68,6 +69,10 @@ private:
     juce::AudioProcessorValueTreeState state;
     juce::dsp::BallisticsFilter<float> envelopeFollower;
     juce::AudioBuffer<float> envelopeFollowerOutputBuffer;
+    juce::Random random;
+
+    //** Custom DSP ================================================================
+    SineOsc osc[4];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };

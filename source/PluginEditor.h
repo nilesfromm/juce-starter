@@ -22,7 +22,6 @@ public:
     void timerCallback() override;
 
 private:
-    // vvv from webview template
     using Resource = juce::WebBrowserComponent::Resource;
     std::optional<Resource> getResource (const juce::String& url) const;
     void nativeFunction (
@@ -33,7 +32,6 @@ private:
     juce::TextButton emitJavaScriptEventButton { "Emit JavaScript event" };
     juce::Label labelUpdatedFromJavaScript { "label",
         "To be updated from JavaScript" };
-    // ^^^ from webview template
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -41,7 +39,6 @@ private:
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };
 
-    // vvv from webview template
     juce::Slider gainSlider { "gain slider" };
     juce::SliderParameterAttachment gainSliderAttachment;
 
@@ -61,7 +58,6 @@ private:
     juce::WebSliderParameterAttachment webGainSliderAttachment;
     juce::WebToggleButtonParameterAttachment webBypassToggleAttachment;
     juce::WebComboBoxParameterAttachment webDistortionTypeComboBoxAttachment;
-    // ^^^ from webview template
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

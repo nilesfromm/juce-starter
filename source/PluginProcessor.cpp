@@ -139,7 +139,7 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused (midiMessages);
+    // juce::ignoreUnused (midiMessages);
 
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels = getTotalNumInputChannels();
@@ -154,6 +154,31 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    // Process MIDI messages
+    for (const auto metadata : midiMessages)
+    {
+        const auto message = metadata.getMessage();
+        if (message.isNoteOn())
+        {
+            // Convert MIDI note number to frequency (A4 = 440Hz)
+            float freq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
+            // Update oscillator 1's frequency
+            osc[0].setFreq (freq);
+            osc[1].setFreq (freq * 2.0f);
+            osc[2].setFreq (freq * 3.0f);
+            osc[3].setFreq (freq * 4.0f);
+        }
+    }
+
+    // Get all frequency and amplitude parameters
+    float freqs[4] = {
+        100, 200, 300, 400
+    };
+
+    float amps[4] = {
+        0.5, 0.4, 0.3, 0.2
+    };
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
@@ -163,48 +188,95 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // for (int channel = 0; channel < totalNumInputChannels; ++channel)
     // {
     //     auto* channelData = buffer.getWritePointer (channel);
-    //     juce::ignoreUnused (channelData);
+    //     // juce::ignoreUnused (channelData);
     //     // ..do something to the data...
+    //     for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
+    //         channelData[sample] = random.nextFloat() * 0.25f - 0.125f;
     // }
 
-    if (parameters.bypass->get() || buffer.getNumSamples() == 0)
+    for (int i = 0; i < buffer.getNumSamples(); i++)
     {
-        return;
+        float sample = 0.0f;
+
+        // Sum all oscillators
+        for (int oscIndex = 0; oscIndex < 4; ++oscIndex)
+        {
+            // Only set frequency for oscillators 2-4 since oscillator 1 is controlled by MIDI
+            // if (oscIndex > 0)
+            //     osc[oscIndex].setFreq(freqs[oscIndex]);
+            sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
+        }
+
+        for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+        {
+            auto* channelData = buffer.getWritePointer (channel);
+            channelData[i] = sample;
+        }
     }
 
-    juce::dsp::AudioBlock<float> block { buffer };
-    if (parameters.distortionType->getIndex() == 1)
-    {
-        // tanh(kx)/tanh(k)
-        juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
-            constexpr auto SATURATION = 5.f;
-            static const auto normalizationFactor = std::tanh (SATURATION);
-            sample = std::tanh (SATURATION * sample) / normalizationFactor;
-            return sample;
-        });
-    }
-    else if (parameters.distortionType->getIndex() == 2)
-    {
-        // sigmoid
-        juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
-            constexpr auto SATURATION = 5.f;
-            sample = 2.f / (1.f + std::exp (-SATURATION * sample)) - 1.f;
-            return sample;
-        });
-    }
+    // for (int i = 0; i < buffer.getNumSamples(); i++)
+    // {
+    //     float sample = random.nextFloat() * 0.25f - 0.125f;
+
+    //     for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+    //     {
+    //         auto* channelData = buffer.getWritePointer (channel);
+    //         channelData[i] = sample;
+    //     }
+    // }
+
+    // *********
+    // void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override
+    // {
+    //     for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
+    //     {
+    //         // Get a pointer to the start sample in the buffer for this audio output channel
+    //         auto* buffer = bufferToFill.buffer->getWritePointer (channel, bufferToFill.startSample);
+    //         // Fill the required number of samples with noise between -0.125 and +0.125
+    //         for (auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+    //             buffer[sample] = random.nextFloat() * 0.25f - 0.125f;
+    //     }
+    // }
+    // *********
+
+    // if (parameters.bypass->get() || buffer.getNumSamples() == 0)
+    // {
+    //     return;
+    // }
+
+    // juce::dsp::AudioBlock<float> block { buffer };
+    // if (parameters.distortionType->getIndex() == 1)
+    // {
+    //     // tanh(kx)/tanh(k)
+    //     juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
+    //         constexpr auto SATURATION = 5.f;
+    //         static const auto normalizationFactor = std::tanh (SATURATION);
+    //         sample = std::tanh (SATURATION * sample) / normalizationFactor;
+    //         return sample;
+    //     });
+    // }
+    // else if (parameters.distortionType->getIndex() == 2)
+    // {
+    //     // sigmoid
+    //     juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
+    //         constexpr auto SATURATION = 5.f;
+    //         sample = 2.f / (1.f + std::exp (-SATURATION * sample)) - 1.f;
+    //         return sample;
+    //     });
+    // }
 
     buffer.applyGain (parameters.gain->get());
 
-    const auto inBlock =
-        juce::dsp::AudioBlock<float> { buffer }.getSubsetChannelBlock (
-            0u, static_cast<size_t> (getTotalNumOutputChannels()));
-    auto outBlock =
-        juce::dsp::AudioBlock<float> { envelopeFollowerOutputBuffer }.getSubBlock (
-            0u, static_cast<size_t> (buffer.getNumSamples()));
-    envelopeFollower.process (
-        juce::dsp::ProcessContextNonReplacing<float> { inBlock, outBlock });
-    outputLevelLeft = juce::Decibels::gainToDecibels (
-        outBlock.getSample (0, static_cast<int> (outBlock.getNumSamples()) - 1));
+    // const auto inBlock =
+    //     juce::dsp::AudioBlock<float> { buffer }.getSubsetChannelBlock (
+    //         0u, static_cast<size_t> (getTotalNumOutputChannels()));
+    // auto outBlock =
+    //     juce::dsp::AudioBlock<float> { envelopeFollowerOutputBuffer }.getSubBlock (
+    //         0u, static_cast<size_t> (buffer.getNumSamples()));
+    // envelopeFollower.process (
+    //     juce::dsp::ProcessContextNonReplacing<float> { inBlock, outBlock });
+    // outputLevelLeft = juce::Decibels::gainToDecibels (
+    //     outBlock.getSample (0, static_cast<int> (outBlock.getNumSamples()) - 1));
 }
 
 //==============================================================================
@@ -243,7 +315,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
     {
         auto parameter = std::make_unique<AudioParameterFloat> (
-            id::GAIN, "gain", NormalisableRange<float> { 0.f, 1.f, 0.01f, 0.9f }, 1.f);
+            id::GAIN, "gain", NormalisableRange<float> { 0.f, 1.f, 0.01f, 0.9f }, 0.2f);
         parameters.gain = parameter.get();
         layout.add (std::move (parameter));
     }
