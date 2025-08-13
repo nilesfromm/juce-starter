@@ -1,9 +1,10 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 
 #if (MSVC)
-#include "ipps.h"
+    #include "ipps.h"
 #endif
 
 class PluginProcessor : public juce::AudioProcessor
@@ -18,6 +19,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    using AudioProcessor::processBlock;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -38,6 +40,34 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    [[nodiscard]] juce::AudioProcessorValueTreeState& getState() noexcept
+    {
+        return state;
+    }
+
+    [[nodiscard]] const juce::AudioParameterChoice& getDistortionTypeParameter()
+        const noexcept
+    {
+        return *parameters.distortionType;
+    }
+
+    std::atomic<float> outputLevelLeft;
+
 private:
+    struct Parameters
+    {
+        juce::AudioParameterFloat* gain { nullptr };
+        juce::AudioParameterBool* bypass { nullptr };
+        juce::AudioParameterChoice* distortionType { nullptr };
+    };
+
+    [[nodiscard]] static juce::AudioProcessorValueTreeState::ParameterLayout
+        createParameterLayout (Parameters&);
+
+    Parameters parameters;
+    juce::AudioProcessorValueTreeState state;
+    juce::dsp::BallisticsFilter<float> envelopeFollower;
+    juce::AudioBuffer<float> envelopeFollowerOutputBuffer;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
