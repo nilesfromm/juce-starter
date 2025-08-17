@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/dsp/Sine.h"
+#include "include/parameters/Parameters.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -46,32 +47,23 @@ public:
         return state;
     }
 
-    [[nodiscard]] const juce::AudioParameterChoice& getDistortionTypeParameter()
-        const noexcept
-    {
-        return *parameters.distortionType;
-    }
-
     std::atomic<float> outputLevelLeft;
 
 private:
-    struct Parameters
-    {
-        juce::AudioParameterFloat* gain { nullptr };
-        juce::AudioParameterBool* bypass { nullptr };
-        juce::AudioParameterChoice* distortionType { nullptr };
-    };
-
-    [[nodiscard]] static juce::AudioProcessorValueTreeState::ParameterLayout
-        createParameterLayout (Parameters&);
-
-    Parameters parameters;
-    juce::AudioProcessorValueTreeState state;
     juce::dsp::BallisticsFilter<float> envelopeFollower;
     juce::AudioBuffer<float> envelopeFollowerOutputBuffer;
     juce::Random random;
 
-    //** Custom DSP ================================================================
+    // Parameters ==================================================================
+    juce::AudioProcessorValueTreeState state {
+        *this,
+        nullptr,
+        "Parameters",
+        Parameters::createParameterLayout (parameters)
+    };
+    Parameters parameters;
+
+    // Custom DSP ================================================================
     SineOsc osc[4];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)

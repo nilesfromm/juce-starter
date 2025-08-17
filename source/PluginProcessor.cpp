@@ -1,5 +1,4 @@
 #include "PluginProcessor.h"
-#include "ParameterIDs.hpp"
 #include "PluginEditor.h"
 #include <cmath>
 #include <functional>
@@ -17,7 +16,7 @@ PluginProcessor::PluginProcessor()
               .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
               ),
-      state { *this, nullptr, "PARAMETERS", createParameterLayout (parameters) }
+      parameters (state)
 {
 }
 
@@ -106,6 +105,9 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     envelopeFollowerOutputBuffer.setSize (getTotalNumOutputChannels(),
         samplesPerBlock);
+
+    for (int i = 0; i < 4; i++)
+        osc[i].setSampleRate (sampleRate);
 }
 
 void PluginProcessor::releaseResources()
@@ -163,20 +165,27 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             // Convert MIDI note number to frequency (A4 = 440Hz)
             float freq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
             // Update oscillator 1's frequency
-            osc[0].setFreq (freq);
-            osc[1].setFreq (freq * 2.0f);
-            osc[2].setFreq (freq * 3.0f);
-            osc[3].setFreq (freq * 4.0f);
+            osc[0].setFreq (freq * parameters.ratio1->get());
+            osc[1].setFreq (freq * parameters.ratio2->get());
+            osc[2].setFreq (freq * parameters.ratio3->get());
+            osc[3].setFreq (freq * parameters.ratio4->get());
         }
     }
 
     // Get all frequency and amplitude parameters
-    float freqs[4] = {
-        100, 200, 300, 400
-    };
+    // float baseFreq = parameters.frequency->get();
+    // float freqs[4] = {
+    //     baseFreq, // fundamental
+    //     baseFreq * 2.0f, // 1st harmonic (octave)
+    //     baseFreq * 3.0f, // 2nd harmonic
+    //     baseFreq * 4.0f // 3rd harmonic
+    // };
 
     float amps[4] = {
-        0.5, 0.4, 0.3, 0.2
+        parameters.gain1->get(),
+        parameters.gain2->get(),
+        parameters.gain3->get(),
+        parameters.gain4->get()
     };
 
     // This is the place where you'd normally do the guts of your plugin's
@@ -204,6 +213,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             // Only set frequency for oscillators 2-4 since oscillator 1 is controlled by MIDI
             // if (oscIndex > 0)
             //     osc[oscIndex].setFreq(freqs[oscIndex]);
+            // osc[oscIndex].setFreq (freqs[oscIndex]);
             sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
         }
 
@@ -265,7 +275,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     //     });
     // }
 
-    buffer.applyGain (parameters.gain->get());
+    // buffer.applyGain (parameters.gain->get());
 
     // const auto inBlock =
     //     juce::dsp::AudioBlock<float> { buffer }.getSubsetChannelBlock (
@@ -293,48 +303,16 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor()
 //==============================================================================
 void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
+    copyXmlToBinary (*state.copyState().createXml(), destData);
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
-}
-
-juce::AudioProcessorValueTreeState::ParameterLayout
-    PluginProcessor::createParameterLayout (
-        PluginProcessor::Parameters& parameters)
-{
-    using namespace juce;
-    AudioProcessorValueTreeState::ParameterLayout layout;
-
+    std::unique_ptr<juce::XmlElement> xml (getXmlFromBinary (data, sizeInBytes));
+    if (xml.get() != nullptr && xml->hasTagName (state.state.getType()))
     {
-        auto parameter = std::make_unique<AudioParameterFloat> (
-            id::GAIN, "gain", NormalisableRange<float> { 0.f, 1.f, 0.01f, 0.9f }, 0.2f);
-        parameters.gain = parameter.get();
-        layout.add (std::move (parameter));
+        state.replaceState (juce::ValueTree::fromXml (*xml));
     }
-
-    {
-        auto parameter = std::make_unique<AudioParameterBool> (
-            id::BYPASS, "bypass", false, AudioParameterBoolAttributes {}.withLabel ("Bypass"));
-        parameters.bypass = parameter.get();
-        layout.add (std::move (parameter));
-    }
-
-    {
-        auto parameter = std::make_unique<AudioParameterChoice> (
-            id::DISTORTION_TYPE, "distortion type", StringArray { "none", "tanh(kx)/tanh(k)", "sigmoid" }, 0);
-        parameters.distortionType = parameter.get();
-        layout.add (std::move (parameter));
-    }
-
-    return layout;
 }
 
 //==============================================================================

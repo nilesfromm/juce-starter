@@ -39,25 +39,45 @@ private:
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };
 
-    juce::Slider gainSlider { "gain slider" };
-    juce::SliderParameterAttachment gainSliderAttachment;
+    juce::Label gainLabel { "gain label", "Gain" };
+    juce::Slider gain1Slider { "gain1 slider" };
+    juce::Slider gain2Slider { "gain2 slider" };
+    juce::Slider gain3Slider { "gain3 slider" };
+    juce::Slider gain4Slider { "gain4 slider" };
+    juce::SliderParameterAttachment gain1SliderAttachment;
+    juce::SliderParameterAttachment gain2SliderAttachment;
+    juce::SliderParameterAttachment gain3SliderAttachment;
+    juce::SliderParameterAttachment gain4SliderAttachment;
 
-    juce::ToggleButton bypassButton { "Bypass" };
-    juce::ButtonParameterAttachment bypassButtonAttachment;
+    juce::Label ratioLabel { "ratio label", "Ratio" };
+    juce::Slider ratio1Slider { "ratio1 slider" };
+    juce::Slider ratio2Slider { "ratio2 slider" };
+    juce::Slider ratio3Slider { "ratio3 slider" };
+    juce::Slider ratio4Slider { "ratio4 slider" };
+    juce::SliderParameterAttachment ratio1SliderAttachment;
+    juce::SliderParameterAttachment ratio2SliderAttachment;
+    juce::SliderParameterAttachment ratio3SliderAttachment;
+    juce::SliderParameterAttachment ratio4SliderAttachment;
 
-    juce::Label distortionTypeLabel { "distortion type label", "Distortion" };
-    juce::ComboBox distortionTypeComboBox { "distortion type combo box" };
-    juce::ComboBoxParameterAttachment distortionTypeComboBoxAttachment;
-
-    juce::WebSliderRelay webGainRelay;
-    juce::WebToggleButtonRelay webBypassRelay;
-    juce::WebComboBoxRelay webDistortionTypeRelay;
+    juce::WebSliderRelay webGain1Relay;
+    juce::WebSliderRelay webGain2Relay;
+    juce::WebSliderRelay webGain3Relay;
+    juce::WebSliderRelay webGain4Relay;
+    juce::WebSliderRelay webRatio1Relay;
+    juce::WebSliderRelay webRatio2Relay;
+    juce::WebSliderRelay webRatio3Relay;
+    juce::WebSliderRelay webRatio4Relay;
 
     juce::WebBrowserComponent webView;
 
-    juce::WebSliderParameterAttachment webGainSliderAttachment;
-    juce::WebToggleButtonParameterAttachment webBypassToggleAttachment;
-    juce::WebComboBoxParameterAttachment webDistortionTypeComboBoxAttachment;
+    juce::WebSliderParameterAttachment webGain1SliderAttachment;
+    juce::WebSliderParameterAttachment webGain2SliderAttachment;
+    juce::WebSliderParameterAttachment webGain3SliderAttachment;
+    juce::WebSliderParameterAttachment webGain4SliderAttachment;
+    juce::WebSliderParameterAttachment webRatio1SliderAttachment;
+    juce::WebSliderParameterAttachment webRatio2SliderAttachment;
+    juce::WebSliderParameterAttachment webRatio3SliderAttachment;
+    juce::WebSliderParameterAttachment webRatio4SliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

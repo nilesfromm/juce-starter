@@ -20,7 +20,7 @@ struct Phasor
 struct SineOsc
 {
     Phasor phasor;
-    float sampleRate = 44100;
+    double sampleRate = 44100;
 
     void setSampleRate (float samplerate) { sampleRate = samplerate; }
 

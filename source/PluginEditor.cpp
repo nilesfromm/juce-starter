@@ -1,7 +1,7 @@
 #include "PluginEditor.h"
 
-#include "ParameterIDs.hpp"
 #include "PluginProcessor.h"
+#include "include/parameters/Parameters.h"
 #include "juce_core/juce_core.h"
 #include "juce_graphics/juce_graphics.h"
 #include "juce_gui_extra/juce_gui_extra.h"
@@ -100,25 +100,56 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      gainSliderAttachment {
-          *processorRef.getState().getParameter (id::GAIN.getParamID()),
-          gainSlider,
+      gain1SliderAttachment {
+          *processorRef.getState().getParameter (id::gain1.getParamID()),
+          gain1Slider,
           nullptr
       },
-      bypassButtonAttachment {
-          *processorRef.getState().getParameter (id::BYPASS.getParamID()),
-          bypassButton,
+      gain2SliderAttachment {
+          *processorRef.getState().getParameter (id::gain2.getParamID()),
+          gain2Slider,
           nullptr
       },
-      distortionTypeComboBoxAttachment {
-          *processorRef.getState().getParameter (
-              id::DISTORTION_TYPE.getParamID()),
-          distortionTypeComboBox,
+      gain3SliderAttachment {
+          *processorRef.getState().getParameter (id::gain3.getParamID()),
+          gain3Slider,
           nullptr
       },
-      webGainRelay { id::GAIN.getParamID() },
-      webBypassRelay { id::BYPASS.getParamID() },
-      webDistortionTypeRelay { id::DISTORTION_TYPE.getParamID() },
+      gain4SliderAttachment {
+          *processorRef.getState().getParameter (id::gain4.getParamID()),
+          gain4Slider,
+          nullptr
+      },
+      ratio1SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio1.getParamID()),
+          ratio1Slider,
+          nullptr
+      },
+      ratio2SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio2.getParamID()),
+          ratio2Slider,
+          nullptr
+      },
+      ratio3SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio3.getParamID()),
+          ratio3Slider,
+          nullptr
+      },
+      ratio4SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio4.getParamID()),
+          ratio4Slider,
+          nullptr
+      },
+
+      webGain1Relay { id::gain1.getParamID() },
+      webGain2Relay { id::gain2.getParamID() },
+      webGain3Relay { id::gain3.getParamID() },
+      webGain4Relay { id::gain4.getParamID() },
+      webRatio1Relay { id::ratio1.getParamID() },
+      webRatio2Relay { id::ratio2.getParamID() },
+      webRatio3Relay { id::ratio3.getParamID() },
+      webRatio4Relay { id::ratio4.getParamID() },
+
       webView {
           juce::WebBrowserComponent::Options {}
               .withBackend (
@@ -155,28 +186,57 @@ PluginEditor::PluginEditor (PluginProcessor& p)
                           completion) {
                       nativeFunction (args, std::move (completion));
                   })
-              .withOptionsFrom (webGainRelay)
-              .withOptionsFrom (webBypassRelay)
-              .withOptionsFrom (webDistortionTypeRelay)
+              .withOptionsFrom (webGain1Relay)
+              .withOptionsFrom (webGain2Relay)
+              .withOptionsFrom (webGain3Relay)
+              .withOptionsFrom (webGain4Relay)
+              .withOptionsFrom (webRatio1Relay)
+              .withOptionsFrom (webRatio2Relay)
+              .withOptionsFrom (webRatio3Relay)
+              .withOptionsFrom (webRatio4Relay)
       },
-      webGainSliderAttachment {
-          *processorRef.getState().getParameter (id::GAIN.getParamID()),
-          webGainRelay,
+      webGain1SliderAttachment {
+          *processorRef.getState().getParameter (id::gain1.getParamID()),
+          webGain1Relay,
           nullptr
       },
-      webBypassToggleAttachment {
-          *processorRef.getState().getParameter (id::BYPASS.getParamID()),
-          webBypassRelay,
+      webGain2SliderAttachment {
+          *processorRef.getState().getParameter (id::gain2.getParamID()),
+          webGain2Relay,
           nullptr
       },
-      webDistortionTypeComboBoxAttachment {
-          *processorRef.getState().getParameter (
-              id::DISTORTION_TYPE.getParamID()),
-          webDistortionTypeRelay,
+      webGain3SliderAttachment {
+          *processorRef.getState().getParameter (id::gain3.getParamID()),
+          webGain3Relay,
+          nullptr
+      },
+      webGain4SliderAttachment {
+          *processorRef.getState().getParameter (id::gain4.getParamID()),
+          webGain4Relay,
+          nullptr
+      },
+      webRatio1SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio1.getParamID()),
+          webRatio1Relay,
+          nullptr
+      },
+      webRatio2SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio2.getParamID()),
+          webRatio2Relay,
+          nullptr
+      },
+      webRatio3SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio3.getParamID()),
+          webRatio3Relay,
+          nullptr
+      },
+      webRatio4SliderAttachment {
+          *processorRef.getState().getParameter (id::ratio4.getParamID()),
+          webRatio4Relay,
           nullptr
       }
 {
-    juce::ignoreUnused (processorRef);
+    // juce::ignoreUnused (processorRef);
 
     addAndMakeVisible (webView);
 
@@ -216,22 +276,28 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 
     addAndMakeVisible (labelUpdatedFromJavaScript);
 
-    gainSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    addAndMakeVisible (gainSlider);
+    addAndMakeVisible (gainLabel);
+    gain1Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    gain2Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    gain3Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    gain4Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    addAndMakeVisible (gain1Slider);
+    addAndMakeVisible (gain2Slider);
+    addAndMakeVisible (gain3Slider);
+    addAndMakeVisible (gain4Slider);
 
-    addAndMakeVisible (bypassButton);
-
-    addAndMakeVisible (distortionTypeLabel);
-
-    const auto& distortionTypeParameter =
-        processorRef.getDistortionTypeParameter();
-    distortionTypeComboBox.addItemList (distortionTypeParameter.choices, 1);
-    distortionTypeComboBox.setSelectedItemIndex (
-        distortionTypeParameter.getIndex(), juce::dontSendNotification);
-    addAndMakeVisible (distortionTypeComboBox);
+    addAndMakeVisible (ratioLabel);
+    ratio1Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    ratio2Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    ratio3Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    ratio4Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    addAndMakeVisible (ratio1Slider);
+    addAndMakeVisible (ratio2Slider);
+    addAndMakeVisible (ratio3Slider);
+    addAndMakeVisible (ratio4Slider);
 
     setResizable (true, true);
-    setSize (800, 600);
+    setSize (800, 800);
 
     startTimer (60);
 }
@@ -247,10 +313,16 @@ void PluginEditor::resized()
     runJavaScriptButton.setBounds (bounds.removeFromTop (50).reduced (5));
     emitJavaScriptEventButton.setBounds (bounds.removeFromTop (50).reduced (5));
     labelUpdatedFromJavaScript.setBounds (bounds.removeFromTop (50).reduced (5));
-    gainSlider.setBounds (bounds.removeFromTop (50).reduced (5));
-    bypassButton.setBounds (bounds.removeFromTop (50).reduced (10));
-    distortionTypeLabel.setBounds (bounds.removeFromTop (50).reduced (5));
-    distortionTypeComboBox.setBounds (bounds.removeFromTop (50).reduced (5));
+    gainLabel.setBounds (bounds.removeFromTop (50).reduced (5));
+    gain1Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    gain2Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    gain3Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    gain4Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    ratioLabel.setBounds (bounds.removeFromTop (50).reduced (5));
+    ratio1Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    ratio2Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    ratio3Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+    ratio4Slider.setBounds (bounds.removeFromTop (50).reduced (5));
 }
 
 void PluginEditor::timerCallback()
