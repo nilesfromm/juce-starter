@@ -22,13 +22,37 @@ public:
 
     [[nodiscard]] static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout (Parameters&);
 
-    juce::AudioParameterFloat* gain1;
-    juce::AudioParameterFloat* gain2;
-    juce::AudioParameterFloat* gain3;
-    juce::AudioParameterFloat* gain4;
+    void prepareToPlay (double sampleRate) noexcept;
+    void update() noexcept;
+    void reset() noexcept;
+    void smooth() noexcept;
 
-    juce::AudioParameterFloat* ratio1;
-    juce::AudioParameterFloat* ratio2;
-    juce::AudioParameterFloat* ratio3;
-    juce::AudioParameterFloat* ratio4;
+    float gain1 = 0.0f;
+    float gain2 = 0.0f;
+    float gain3 = 0.0f;
+    float gain4 = 0.0f;
+
+    float ratio1 = 0.0f;
+    float ratio2 = 0.0f;
+    float ratio3 = 0.0f;
+    float ratio4 = 0.0f;
+
+private:
+    juce::AudioParameterFloat* gain1Param;
+    juce::LinearSmoothedValue<float> gain1Smoothed;
+    juce::AudioParameterFloat* gain2Param;
+    juce::LinearSmoothedValue<float> gain2Smoothed;
+    juce::AudioParameterFloat* gain3Param;
+    juce::LinearSmoothedValue<float> gain3Smoothed;
+    juce::AudioParameterFloat* gain4Param;
+    juce::LinearSmoothedValue<float> gain4Smoothed;
+
+    juce::AudioParameterFloat* ratio1Param;
+    juce::LinearSmoothedValue<float> ratio1Smoothed;
+    juce::AudioParameterFloat* ratio2Param;
+    juce::LinearSmoothedValue<float> ratio2Smoothed;
+    juce::AudioParameterFloat* ratio3Param;
+    juce::LinearSmoothedValue<float> ratio3Smoothed;
+    juce::AudioParameterFloat* ratio4Param;
+    juce::LinearSmoothedValue<float> ratio4Smoothed;
 };

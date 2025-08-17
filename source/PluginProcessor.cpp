@@ -92,19 +92,8 @@ void PluginProcessor::changeProgramName (int index, const juce::String& newName)
 //==============================================================================
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    using namespace juce;
-
-    envelopeFollower.prepare (dsp::ProcessSpec {
-        .sampleRate = sampleRate,
-        .maximumBlockSize = static_cast<uint32> (samplesPerBlock),
-        .numChannels = static_cast<uint32> (getTotalNumOutputChannels()) });
-    envelopeFollower.setAttackTime (200.f);
-    envelopeFollower.setReleaseTime (200.f);
-    envelopeFollower.setLevelCalculationType (
-        dsp::BallisticsFilter<float>::LevelCalculationType::peak);
-
-    envelopeFollowerOutputBuffer.setSize (getTotalNumOutputChannels(),
-        samplesPerBlock);
+    parameters.prepareToPlay (sampleRate);
+    parameters.reset();
 
     for (int i = 0; i < 4; i++)
         osc[i].setSampleRate (sampleRate);
@@ -163,130 +152,60 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         if (message.isNoteOn())
         {
             // Convert MIDI note number to frequency (A4 = 440Hz)
-            float freq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
-            // Update oscillator 1's frequency
-            osc[0].setFreq (freq * parameters.ratio1->get());
-            osc[1].setFreq (freq * parameters.ratio2->get());
-            osc[2].setFreq (freq * parameters.ratio3->get());
-            osc[3].setFreq (freq * parameters.ratio4->get());
+            baseFreq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
         }
     }
 
     // Get all frequency and amplitude parameters
-    // float baseFreq = parameters.frequency->get();
+    parameters.update();
+
     // float freqs[4] = {
-    //     baseFreq, // fundamental
-    //     baseFreq * 2.0f, // 1st harmonic (octave)
-    //     baseFreq * 3.0f, // 2nd harmonic
-    //     baseFreq * 4.0f // 3rd harmonic
+    //     baseFreq * parameters.ratio1,
+    //     baseFreq * parameters.ratio2,
+    //     baseFreq * parameters.ratio3,
+    //     baseFreq * parameters.ratio4
     // };
 
-    float amps[4] = {
-        parameters.gain1->get(),
-        parameters.gain2->get(),
-        parameters.gain3->get(),
-        parameters.gain4->get()
-    };
+    // float amps[4] = {
+    //     parameters.gain1,
+    //     parameters.gain2,
+    //     parameters.gain3,
+    //     parameters.gain4
+    // };
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    // for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    // Set all oscillator frequencies
+    // for (int i = 0; i < 4; i++)
     // {
-    //     auto* channelData = buffer.getWritePointer (channel);
-    //     // juce::ignoreUnused (channelData);
-    //     // ..do something to the data...
-    //     for (auto sample = 0; sample < buffer.getNumSamples(); ++sample)
-    //         channelData[sample] = random.nextFloat() * 0.25f - 0.125f;
+    //     osc[i].setFreq (freqs[i]);
     // }
+
+    float* channelDataL = buffer.getWritePointer (0);
+    float* channelDataR = buffer.getWritePointer (1);
 
     for (int i = 0; i < buffer.getNumSamples(); i++)
     {
+        parameters.smooth();
         float sample = 0.0f;
 
+        osc[0].setFreq (baseFreq * parameters.ratio1);
+        osc[1].setFreq (baseFreq * parameters.ratio2);
+        osc[2].setFreq (baseFreq * parameters.ratio3);
+        osc[3].setFreq (baseFreq * parameters.ratio4);
+
+        sample += osc[0].next() * (parameters.gain1 * 0.5f);
+        sample += osc[1].next() * (parameters.gain2 * 0.5f);
+        sample += osc[2].next() * (parameters.gain3 * 0.5f);
+        sample += osc[3].next() * (parameters.gain4 * 0.5f);
+
         // Sum all oscillators
-        for (int oscIndex = 0; oscIndex < 4; ++oscIndex)
-        {
-            // Only set frequency for oscillators 2-4 since oscillator 1 is controlled by MIDI
-            // if (oscIndex > 0)
-            //     osc[oscIndex].setFreq(freqs[oscIndex]);
-            // osc[oscIndex].setFreq (freqs[oscIndex]);
-            sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
-        }
+        // for (int oscIndex = 0; oscIndex < 4; ++oscIndex)
+        // {
+        //     sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
+        // }
 
-        for (int channel = 0; channel < totalNumOutputChannels; ++channel)
-        {
-            auto* channelData = buffer.getWritePointer (channel);
-            channelData[i] = sample;
-        }
+        channelDataL[i] = sample;
+        channelDataR[i] = sample;
     }
-
-    // for (int i = 0; i < buffer.getNumSamples(); i++)
-    // {
-    //     float sample = random.nextFloat() * 0.25f - 0.125f;
-
-    //     for (int channel = 0; channel < totalNumOutputChannels; ++channel)
-    //     {
-    //         auto* channelData = buffer.getWritePointer (channel);
-    //         channelData[i] = sample;
-    //     }
-    // }
-
-    // *********
-    // void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override
-    // {
-    //     for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
-    //     {
-    //         // Get a pointer to the start sample in the buffer for this audio output channel
-    //         auto* buffer = bufferToFill.buffer->getWritePointer (channel, bufferToFill.startSample);
-    //         // Fill the required number of samples with noise between -0.125 and +0.125
-    //         for (auto sample = 0; sample < bufferToFill.numSamples; ++sample)
-    //             buffer[sample] = random.nextFloat() * 0.25f - 0.125f;
-    //     }
-    // }
-    // *********
-
-    // if (parameters.bypass->get() || buffer.getNumSamples() == 0)
-    // {
-    //     return;
-    // }
-
-    // juce::dsp::AudioBlock<float> block { buffer };
-    // if (parameters.distortionType->getIndex() == 1)
-    // {
-    //     // tanh(kx)/tanh(k)
-    //     juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
-    //         constexpr auto SATURATION = 5.f;
-    //         static const auto normalizationFactor = std::tanh (SATURATION);
-    //         sample = std::tanh (SATURATION * sample) / normalizationFactor;
-    //         return sample;
-    //     });
-    // }
-    // else if (parameters.distortionType->getIndex() == 2)
-    // {
-    //     // sigmoid
-    //     juce::dsp::AudioBlock<float>::process (block, block, [] (float sample) {
-    //         constexpr auto SATURATION = 5.f;
-    //         sample = 2.f / (1.f + std::exp (-SATURATION * sample)) - 1.f;
-    //         return sample;
-    //     });
-    // }
-
-    // buffer.applyGain (parameters.gain->get());
-
-    // const auto inBlock =
-    //     juce::dsp::AudioBlock<float> { buffer }.getSubsetChannelBlock (
-    //         0u, static_cast<size_t> (getTotalNumOutputChannels()));
-    // auto outBlock =
-    //     juce::dsp::AudioBlock<float> { envelopeFollowerOutputBuffer }.getSubBlock (
-    //         0u, static_cast<size_t> (buffer.getNumSamples()));
-    // envelopeFollower.process (
-    //     juce::dsp::ProcessContextNonReplacing<float> { inBlock, outBlock });
-    // outputLevelLeft = juce::Decibels::gainToDecibels (
-    //     outBlock.getSample (0, static_cast<int> (outBlock.getNumSamples()) - 1));
 }
 
 //==============================================================================

@@ -50,9 +50,7 @@ public:
     std::atomic<float> outputLevelLeft;
 
 private:
-    juce::dsp::BallisticsFilter<float> envelopeFollower;
-    juce::AudioBuffer<float> envelopeFollowerOutputBuffer;
-    juce::Random random;
+    float baseFreq = 440.0f;
 
     // Parameters ==================================================================
     juce::AudioProcessorValueTreeState state {

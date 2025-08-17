@@ -70,6 +70,7 @@
     "functional": "cpp",
     "__config": "cpp",
     "*.mm": "cpp",
-    "span": "cpp"
+    "span": "cpp",
+    "__assertion_handler": "cpp"
   }
 }
