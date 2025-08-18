@@ -1,26 +1,27 @@
 {
   "version": "0.2.0",
   "configurations": [
-      {
-          "name": "(lldb) Launch",
-          "type": "cppdbg",
-          "request": "launch",
-          "program": "${command:cmake.launchTargetPath}",
-          "args": [],
-          "stopAtEntry": false,
-          "cwd": "${workspaceFolder}",
-          "environment": [
-              {
-                  "name": "PATH",
-                  "value": "$PATH:${command:cmake.launchTargetDirectory}"
-              }
-          ],
-          "MIMode": "lldb",
-          "logging": {
-              "moduleLoad": false
-          }
-      },
-      {
+    {
+        "name": "Standalone Debug",
+        "type": "cppdbg",
+        "request": "launch",
+        // "program": "${command:cmake.launchTargetPath}",
+        "program": "${workspaceFolder}/build/OP8_artefacts/Debug/Standalone/OP8.app",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [
+            {
+                "name": "PATH",
+                "value": "$PATH:${command:cmake.launchTargetDirectory}"
+            }
+        ],
+        "MIMode": "lldb",
+        "logging": {
+            "moduleLoad": false
+        }
+    },
+    {
         "name": "VST3 AudioHost Debug",
         "type": "cppdbg",
         "request": "launch",

@@ -145,16 +145,17 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    splitBufferByEvents (buffer, midiMessages);
     // Process MIDI messages
-    for (const auto metadata : midiMessages)
-    {
-        const auto message = metadata.getMessage();
-        if (message.isNoteOn())
-        {
-            // Convert MIDI note number to frequency (A4 = 440Hz)
-            baseFreq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
-        }
-    }
+    // for (const auto metadata : midiMessages)
+    // {
+    //     const auto message = metadata.getMessage();
+    //     if (message.isNoteOn())
+    //     {
+    //         // Convert MIDI note number to frequency (A4 = 440Hz)
+    //         baseFreq = 440.0f * std::pow (2.0f, (message.getNoteNumber() - 69) / 12.0f);
+    //     }
+    // }
 
     // Get all frequency and amplitude parameters
     parameters.update();
@@ -206,6 +207,56 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         channelDataL[i] = sample;
         channelDataR[i] = sample;
     }
+}
+
+void PluginProcessor::splitBufferByEvents (juce::AudioBuffer<float>& buffer,
+    juce::MidiBuffer& midiMessages)
+{
+    int bufferOffset = 0;
+
+    for (const auto metadata : midiMessages)
+    {
+        // Render the audio that happens before this event (if any).
+        int samplesThisSegment = metadata.samplePosition - bufferOffset;
+        if (samplesThisSegment > 0)
+        {
+            render (buffer, samplesThisSegment, bufferOffset);
+            bufferOffset += samplesThisSegment;
+        }
+
+        // Handle the event. Ignore MIDI messages such as sysex.
+        if (metadata.numBytes <= 3)
+        {
+            uint8_t data1 = (metadata.numBytes >= 2) ? metadata.data[1] : 0;
+            uint8_t data2 = (metadata.numBytes == 3) ? metadata.data[2] : 0;
+            handleMIDI (metadata.data[0], data1, data2);
+        }
+    }
+
+    // Render the audio after the last MIDI event. If there were no
+    // MIDI events at all, this renders the entire buffer.
+    int samplesLastSegment = buffer.getNumSamples() - bufferOffset;
+    if (samplesLastSegment > 0)
+    {
+        render (buffer, samplesLastSegment, bufferOffset);
+    }
+
+    midiMessages.clear();
+}
+
+void PluginProcessor::handleMIDI (uint8_t data0, uint8_t data1, uint8_t data2)
+{
+    char s[16];
+    snprintf (s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);
+    DBG (s);
+}
+
+void PluginProcessor::render (
+    juce::AudioBuffer<float>& buffer,
+    int sampleCount,
+    int bufferOffset)
+{
+    // do nothing yet
 }
 
 //==============================================================================
