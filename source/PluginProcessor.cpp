@@ -92,8 +92,9 @@ void PluginProcessor::changeProgramName (int index, const juce::String& newName)
 //==============================================================================
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    synth.allocateResources (sampleRate, samplesPerBlock);
     parameters.prepareToPlay (sampleRate);
-    parameters.reset();
+    reset();
 
     for (int i = 0; i < 4; i++)
         osc[i].setSampleRate (sampleRate);
@@ -103,6 +104,13 @@ void PluginProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    synth.deallocateResources();
+}
+
+void PluginProcessor::reset()
+{
+    parameters.reset();
+    synth.reset();
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -180,33 +188,33 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     //     osc[i].setFreq (freqs[i]);
     // }
 
-    float* channelDataL = buffer.getWritePointer (0);
-    float* channelDataR = buffer.getWritePointer (1);
+    // float* channelDataL = buffer.getWritePointer (0);
+    // float* channelDataR = buffer.getWritePointer (1);
 
-    for (int i = 0; i < buffer.getNumSamples(); i++)
-    {
-        parameters.smooth();
-        float sample = 0.0f;
+    // for (int i = 0; i < buffer.getNumSamples(); i++)
+    // {
+    //     parameters.smooth();
+    //     float sample = 0.0f;
 
-        osc[0].setFreq (baseFreq * parameters.ratio1);
-        osc[1].setFreq (baseFreq * parameters.ratio2);
-        osc[2].setFreq (baseFreq * parameters.ratio3);
-        osc[3].setFreq (baseFreq * parameters.ratio4);
+    //     osc[0].setFreq (baseFreq * parameters.ratio1);
+    //     osc[1].setFreq (baseFreq * parameters.ratio2);
+    //     osc[2].setFreq (baseFreq * parameters.ratio3);
+    //     osc[3].setFreq (baseFreq * parameters.ratio4);
 
-        sample += osc[0].next() * (parameters.gain1 * 0.5f);
-        sample += osc[1].next() * (parameters.gain2 * 0.5f);
-        sample += osc[2].next() * (parameters.gain3 * 0.5f);
-        sample += osc[3].next() * (parameters.gain4 * 0.5f);
+    //     sample += osc[0].next() * (parameters.gain1 * 0.5f);
+    //     sample += osc[1].next() * (parameters.gain2 * 0.5f);
+    //     sample += osc[2].next() * (parameters.gain3 * 0.5f);
+    //     sample += osc[3].next() * (parameters.gain4 * 0.5f);
 
-        // Sum all oscillators
-        // for (int oscIndex = 0; oscIndex < 4; ++oscIndex)
-        // {
-        //     sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
-        // }
+    //     // Sum all oscillators
+    //     // for (int oscIndex = 0; oscIndex < 4; ++oscIndex)
+    //     // {
+    //     //     sample += osc[oscIndex].next() * (amps[oscIndex] * 0.5f);
+    //     // }
 
-        channelDataL[i] = sample;
-        channelDataR[i] = sample;
-    }
+    //     channelDataL[i] = sample;
+    //     channelDataR[i] = sample;
+    // }
 }
 
 void PluginProcessor::splitBufferByEvents (juce::AudioBuffer<float>& buffer,
@@ -246,9 +254,7 @@ void PluginProcessor::splitBufferByEvents (juce::AudioBuffer<float>& buffer,
 
 void PluginProcessor::handleMIDI (uint8_t data0, uint8_t data1, uint8_t data2)
 {
-    char s[16];
-    snprintf (s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);
-    DBG (s);
+    synth.midiMessage (data0, data1, data2);
 }
 
 void PluginProcessor::render (
@@ -256,7 +262,13 @@ void PluginProcessor::render (
     int sampleCount,
     int bufferOffset)
 {
-    // do nothing yet
+    float* outputBuffers[2] = { nullptr, nullptr };
+    outputBuffers[0] = buffer.getWritePointer (0) + bufferOffset;
+    if (getTotalNumOutputChannels() > 1)
+    {
+        outputBuffers[1] = buffer.getWritePointer (1) + bufferOffset;
+    }
+    synth.render (outputBuffers, sampleCount);
 }
 
 //==============================================================================

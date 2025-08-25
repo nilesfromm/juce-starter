@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/dsp/Sine.h"
+#include "include/dsp/Synth.h"
 #include "include/parameters/Parameters.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
@@ -17,6 +18,7 @@ public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
+    void reset() override;
 
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
@@ -67,6 +69,7 @@ private:
     Parameters parameters;
 
     // Custom DSP ================================================================
+    Synth synth;
     SineOsc osc[4];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
