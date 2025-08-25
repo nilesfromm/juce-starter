@@ -1,8 +1,8 @@
 #pragma once
 
-#include "include/dsp/Sine.h"
-#include "include/dsp/Synth.h"
-#include "include/parameters/Parameters.h"
+#include "dsp/Sine.h"
+#include "dsp/Synth.h"
+#include "parameters/Parameters.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 

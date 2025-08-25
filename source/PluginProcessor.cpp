@@ -166,7 +166,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // }
 
     // Get all frequency and amplitude parameters
-    parameters.update();
+    // parameters.update();
 
     // float freqs[4] = {
     //     baseFreq * parameters.ratio1,
@@ -255,6 +255,9 @@ void PluginProcessor::splitBufferByEvents (juce::AudioBuffer<float>& buffer,
 void PluginProcessor::handleMIDI (uint8_t data0, uint8_t data1, uint8_t data2)
 {
     synth.midiMessage (data0, data1, data2);
+    // char s[16];
+    // snprintf (s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);
+    // DBG (s);
 }
 
 void PluginProcessor::render (
