@@ -3,6 +3,7 @@
 #include "dsp/Sine.h"
 #include "dsp/Synth.h"
 #include "parameters/Parameters.h"
+#include "parameters/Preset.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -10,7 +11,8 @@
     #include "ipps.h"
 #endif
 
-class PluginProcessor : public juce::AudioProcessor
+class PluginProcessor : public juce::AudioProcessor,
+                        juce::ValueTree::Listener
 {
 public:
     PluginProcessor();
@@ -24,6 +26,8 @@ public:
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
+
+    void updateParameters();
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -53,6 +57,11 @@ public:
 
 private:
     float baseFreq = 440.0f;
+    std::atomic<bool> parametersChanged { false };
+    void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&) override
+    {
+        parametersChanged = true;
+    }
 
     // Midi ======================================================================
     void splitBufferByEvents (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages);
@@ -67,6 +76,9 @@ private:
         Parameters::createParameterLayout (parameters)
     };
     Parameters parameters;
+    void createPresets();
+    std::vector<Preset> presets;
+    int currentPreset;
 
     // Custom DSP ================================================================
     Synth synth;

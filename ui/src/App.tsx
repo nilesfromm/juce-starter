@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
 import "./App.css";
+import Slider from "./components/Slider";
 import * as Juce from "./juce/index.js";
 
 function App() {
-  const sliderRef = useRef<HTMLInputElement>(null);
+  
   console.log("JUCE frontend library successfully imported");
   console.log(Juce);
   const nativeFunction = Juce.getNativeFunction("nativeFunction") as (
@@ -30,16 +30,7 @@ function App() {
     });
   };
 
-  const sliderState = Juce.getSliderState("GAIN");
-  const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    sliderState.setNormalisedValue(event.target.value);
-  };
 
-  sliderState.valueChangedEvent.addListener(() => {
-    if (sliderRef.current) {
-      sliderRef.current.value = sliderState.getNormalisedValue();
-    }
-  });
 
   return (
     <div className="size-full h-screen flex flex-col gap-2 items-center justify-center bg-black text-white">
@@ -61,18 +52,11 @@ function App() {
       >
         Native Function
       </button>
-      <div className="w-full p-4 bg-blue-500/50 flex items-center justify-center">
-        <input
-          ref={sliderRef}
-          type="range"
-          id="gainSlider"
-          min="0"
-          max="1"
-          step="0.001"
-          className="w-full"
-          onChange={handleSliderChange}
-        />
-      </div>
+      <Slider sliderId="attack" />
+      <Slider sliderId="decay" />
+      <Slider sliderId="sustain" />
+      <Slider sliderId="release" />
+      <Slider sliderId="noise" />
     </div>
   );
 }

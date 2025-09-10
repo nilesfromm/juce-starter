@@ -18,7 +18,10 @@ void Synth::deallocateResources()
 
 void Synth::reset()
 {
-    voice.reset();
+    for (int v = 0; v < MAX_VOICES; v++)
+    {
+        voices[v].reset();
+    }
     noiseOsc.reset();
 }
 
@@ -29,16 +32,35 @@ void Synth::render (float** outputBuffers, int sampleCount)
 
     for (int sample = 0; sample < sampleCount; sample++)
     {
-        float output = 0.0f;
+        float noise = noiseOsc.nextValue() * noiseMix;
+        float outputLeft = 0.0f;
+        float outputRight = 0.0f;
 
-        if (voice.note > 0)
+        for (int v = 0; v < MAX_VOICES; v++)
         {
-            output = voice.render();
+            Voice& voice = voices[v];
+            if (voice.env.isActive())
+            {
+                float output = voice.render (noise);
+                outputLeft += output;
+                outputRight += output;
+            }
         }
-        outputBufferLeft[sample] = output;
+
+        outputBufferLeft[sample] = outputLeft;
         if (outputBufferRight != nullptr)
-            outputBufferRight[sample] = output;
+            outputBufferRight[sample] = outputRight;
     }
+
+    for (int v = 0; v < MAX_VOICES; v++)
+    {
+        Voice& voice = voices[v];
+        if (!voice.env.isActive())
+        {
+            voice.env.reset();
+        }
+    }
+
     limiter (outputBufferLeft, sampleCount);
     if (outputBufferRight != nullptr)
         limiter (outputBufferRight, sampleCount);
@@ -66,19 +88,33 @@ void Synth::midiMessage (uint8_t data0, uint8_t data1, uint8_t data2)
 
 void Synth::noteOn (int note, int velocity)
 {
+    startVoice (0, note, velocity);
+}
+
+void Synth::startVoice (int v, int note, int velocity)
+{
+    // float freq = 440.0f * exp2 (float (note - 69) / 12.0f);
+    float freq = 8.1758 * exp (0.057762265046662 * float (note));
+
+    Voice& voice = voices[v];
     voice.note = note;
-
-    float freq = 440.0f * exp2 (float (note - 69) / 12.0f);
-
     voice.osc.amp = (velocity / 127.0f) * 0.5f;
     voice.osc.inc = freq / sampleRate;
     voice.osc.reset();
+
+    Envelope& env = voice.env;
+    env.attackMultiplier = envAttack;
+    env.decayMultiplier = envDecay;
+    env.sustainLevel = envSustain;
+    env.releaseMultiplier = envRelease;
+    env.attack();
 }
 
 void Synth::noteOff (int note)
 {
+    Voice& voice = voices[0];
     if (voice.note == note)
     {
-        voice.note = 0;
+        voice.env.release();
     }
 }

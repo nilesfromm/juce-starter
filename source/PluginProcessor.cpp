@@ -18,10 +18,14 @@ PluginProcessor::PluginProcessor()
               ),
       parameters (state)
 {
+    state.state.addListener (this);
+    createPresets();
+    currentPreset = 0;
 }
 
 PluginProcessor::~PluginProcessor()
 {
+    state.state.removeListener (this);
 }
 
 //==============================================================================
@@ -64,24 +68,42 @@ double PluginProcessor::getTailLengthSeconds() const
 
 int PluginProcessor::getNumPrograms()
 {
-    return 1; // NB: some hosts don't cope very well if you tell them there are 0 programs,
-        // so this should be at least 1, even if you're not really implementing programs.
+    const int numPresets = presets.size();
+    return numPresets > 0 ? numPresets : 1;
 }
 
 int PluginProcessor::getCurrentProgram()
 {
-    return 0;
+    return currentPreset;
 }
 
 void PluginProcessor::setCurrentProgram (int index)
 {
-    juce::ignoreUnused (index);
+    currentPreset = index;
+
+    juce::RangedAudioParameter* params[NUM_PARAMETERS] = {
+        parameters.gain1Param,
+        parameters.gain2Param,
+        parameters.gain3Param,
+        parameters.gain4Param,
+        parameters.ratio1Param,
+        parameters.ratio2Param,
+        parameters.ratio3Param,
+        parameters.ratio4Param,
+        parameters.noiseParam,
+    };
+
+    const Preset& preset = presets[index];
+    for (int i = 0; i < NUM_PARAMETERS; i++)
+    {
+        params[i]->setValueNotifyingHost (params[i]->convertTo0to1 (preset.parameters[i]));
+    }
+    reset();
 }
 
 const juce::String PluginProcessor::getProgramName (int index)
 {
-    juce::ignoreUnused (index);
-    return {};
+    return { presets[index].name };
 }
 
 void PluginProcessor::changeProgramName (int index, const juce::String& newName)
@@ -89,11 +111,18 @@ void PluginProcessor::changeProgramName (int index, const juce::String& newName)
     juce::ignoreUnused (index, newName);
 }
 
+void PluginProcessor::createPresets()
+{
+    presets.emplace_back ("Default", 0.5f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+    presets.emplace_back ("Number 2", 0.5f, 0.25f, 0.25f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 0.66f);
+}
+
 //==============================================================================
 void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.allocateResources (sampleRate, samplesPerBlock);
     parameters.prepareToPlay (sampleRate);
+    parametersChanged.store (true);
     reset();
 
     for (int i = 0; i < 4; i++)
@@ -135,6 +164,32 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 #endif
 }
 
+void PluginProcessor::updateParameters()
+{
+    float sampleRate = float (getSampleRate());
+    float inverseSampleRate = 1.0f / sampleRate;
+
+    synth.envAttack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.attackParam->get()));
+
+    synth.envDecay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.decayParam->get()));
+
+    synth.envSustain = parameters.sustainParam->get() / 100.0f;
+
+    float envRelease = parameters.releaseParam->get();
+    if (envRelease < 1.0f)
+    {
+        synth.envRelease = 0.75f;
+    }
+    else
+    {
+        synth.envRelease = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease));
+    }
+
+    float noiseMix = parameters.noiseParam->get();
+    noiseMix *= noiseMix;
+    synth.noiseMix = noiseMix * 0.06f;
+}
+
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::MidiBuffer& midiMessages)
 {
@@ -152,6 +207,12 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
+    bool expected = true;
+    if (isNonRealtime() || parametersChanged.compare_exchange_strong (expected, false))
+    {
+        updateParameters();
+    }
 
     splitBufferByEvents (buffer, midiMessages);
     // Process MIDI messages
@@ -254,6 +315,15 @@ void PluginProcessor::splitBufferByEvents (juce::AudioBuffer<float>& buffer,
 
 void PluginProcessor::handleMIDI (uint8_t data0, uint8_t data1, uint8_t data2)
 {
+    // Program Change
+    if ((data0 & 0xF0) == 0xC0)
+    {
+        if (data1 < presets.size())
+        {
+            setCurrentProgram (data1);
+        }
+    }
+
     synth.midiMessage (data0, data1, data2);
     // char s[16];
     // snprintf (s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);

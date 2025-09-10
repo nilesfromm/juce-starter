@@ -4,15 +4,26 @@
 
 namespace id
 {
-    const juce::ParameterID gain1 { "gain1", 1 };
-    const juce::ParameterID gain2 { "gain2", 1 };
-    const juce::ParameterID gain3 { "gain3", 1 };
-    const juce::ParameterID gain4 { "gain4", 1 };
+#define PARAMETER_ID(str) const juce::ParameterID str (#str, 1) //could be static const?
 
-    const juce::ParameterID ratio1 { "ratio1", 1 };
-    const juce::ParameterID ratio2 { "ratio2", 1 };
-    const juce::ParameterID ratio3 { "ratio3", 1 };
-    const juce::ParameterID ratio4 { "ratio4", 1 };
+    PARAMETER_ID (gain1);
+    PARAMETER_ID (gain2);
+    PARAMETER_ID (gain3);
+    PARAMETER_ID (gain4);
+
+    PARAMETER_ID (ratio1);
+    PARAMETER_ID (ratio2);
+    PARAMETER_ID (ratio3);
+    PARAMETER_ID (ratio4);
+
+    PARAMETER_ID (attack);
+    PARAMETER_ID (decay);
+    PARAMETER_ID (sustain);
+    PARAMETER_ID (release);
+
+    PARAMETER_ID (noise);
+
+#undef PARAMETER_ID
 } // id
 
 class Parameters
@@ -37,22 +48,45 @@ public:
     float ratio3 = 0.0f;
     float ratio4 = 0.0f;
 
-private:
+    float attack = 0.0f;
+    float decay = 0.0f;
+    float sustain = 0.0f;
+    float release = 0.0f;
+
+    float noise = 0.0f;
+
     juce::AudioParameterFloat* gain1Param;
-    juce::LinearSmoothedValue<float> gain1Smoothed;
     juce::AudioParameterFloat* gain2Param;
-    juce::LinearSmoothedValue<float> gain2Smoothed;
     juce::AudioParameterFloat* gain3Param;
-    juce::LinearSmoothedValue<float> gain3Smoothed;
     juce::AudioParameterFloat* gain4Param;
-    juce::LinearSmoothedValue<float> gain4Smoothed;
 
     juce::AudioParameterFloat* ratio1Param;
-    juce::LinearSmoothedValue<float> ratio1Smoothed;
     juce::AudioParameterFloat* ratio2Param;
-    juce::LinearSmoothedValue<float> ratio2Smoothed;
     juce::AudioParameterFloat* ratio3Param;
-    juce::LinearSmoothedValue<float> ratio3Smoothed;
     juce::AudioParameterFloat* ratio4Param;
+
+    juce::AudioParameterFloat* attackParam;
+    juce::AudioParameterFloat* decayParam;
+    juce::AudioParameterFloat* sustainParam;
+    juce::AudioParameterFloat* releaseParam;
+
+    juce::AudioParameterFloat* noiseParam;
+
+private:
+    juce::LinearSmoothedValue<float> gain1Smoothed;
+    juce::LinearSmoothedValue<float> gain2Smoothed;
+    juce::LinearSmoothedValue<float> gain3Smoothed;
+    juce::LinearSmoothedValue<float> gain4Smoothed;
+
+    juce::LinearSmoothedValue<float> ratio1Smoothed;
+    juce::LinearSmoothedValue<float> ratio2Smoothed;
+    juce::LinearSmoothedValue<float> ratio3Smoothed;
     juce::LinearSmoothedValue<float> ratio4Smoothed;
+
+    juce::LinearSmoothedValue<float> attackSmoothed;
+    juce::LinearSmoothedValue<float> decaySmoothed;
+    juce::LinearSmoothedValue<float> sustainSmoothed;
+    juce::LinearSmoothedValue<float> releaseSmoothed;
+
+    juce::LinearSmoothedValue<float> noiseSmoothed;
 };

@@ -140,6 +140,32 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           ratio4Slider,
           nullptr
       },
+      // Envelope sliders
+      attackSliderAttachment {
+          *processorRef.getState().getParameter (id::attack.getParamID()),
+          attackSlider,
+          nullptr
+      },
+      decaySliderAttachment {
+          *processorRef.getState().getParameter (id::decay.getParamID()),
+          decaySlider,
+          nullptr
+      },
+      sustainSliderAttachment {
+          *processorRef.getState().getParameter (id::sustain.getParamID()),
+          sustainSlider,
+          nullptr
+      },
+      releaseSliderAttachment {
+          *processorRef.getState().getParameter (id::release.getParamID()),
+          releaseSlider,
+          nullptr
+      },
+      noiseSliderAttachment {
+          *processorRef.getState().getParameter (id::noise.getParamID()),
+          noiseSlider,
+          nullptr
+      },
 
       webGain1Relay { id::gain1.getParamID() },
       webGain2Relay { id::gain2.getParamID() },
@@ -149,6 +175,12 @@ PluginEditor::PluginEditor (PluginProcessor& p)
       webRatio2Relay { id::ratio2.getParamID() },
       webRatio3Relay { id::ratio3.getParamID() },
       webRatio4Relay { id::ratio4.getParamID() },
+
+      webAttackRelay { id::attack.getParamID() },
+      webDecayRelay { id::decay.getParamID() },
+      webSustainRelay { id::sustain.getParamID() },
+      webReleaseRelay { id::release.getParamID() },
+      webNoiseRelay { id::noise.getParamID() },
 
       webView {
           juce::WebBrowserComponent::Options {}
@@ -194,6 +226,11 @@ PluginEditor::PluginEditor (PluginProcessor& p)
               .withOptionsFrom (webRatio2Relay)
               .withOptionsFrom (webRatio3Relay)
               .withOptionsFrom (webRatio4Relay)
+              .withOptionsFrom (webAttackRelay)
+              .withOptionsFrom (webDecayRelay)
+              .withOptionsFrom (webSustainRelay)
+              .withOptionsFrom (webReleaseRelay)
+              .withOptionsFrom (webNoiseRelay)
       },
       webGain1SliderAttachment {
           *processorRef.getState().getParameter (id::gain1.getParamID()),
@@ -233,6 +270,31 @@ PluginEditor::PluginEditor (PluginProcessor& p)
       webRatio4SliderAttachment {
           *processorRef.getState().getParameter (id::ratio4.getParamID()),
           webRatio4Relay,
+          nullptr
+      },
+      webAttackSliderAttachment {
+          *processorRef.getState().getParameter (id::attack.getParamID()),
+          webAttackRelay,
+          nullptr
+      },
+      webDecaySliderAttachment {
+          *processorRef.getState().getParameter (id::decay.getParamID()),
+          webDecayRelay,
+          nullptr
+      },
+      webSustainSliderAttachment {
+          *processorRef.getState().getParameter (id::sustain.getParamID()),
+          webSustainRelay,
+          nullptr
+      },
+      webReleaseSliderAttachment {
+          *processorRef.getState().getParameter (id::release.getParamID()),
+          webReleaseRelay,
+          nullptr
+      },
+      webNoiseSliderAttachment {
+          *processorRef.getState().getParameter (id::noise.getParamID()),
+          webNoiseRelay,
           nullptr
       }
 {
@@ -296,6 +358,20 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     addAndMakeVisible (ratio3Slider);
     addAndMakeVisible (ratio4Slider);
 
+    addAndMakeVisible (envelopeLabel);
+    attackSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    decaySlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    sustainSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    releaseSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    addAndMakeVisible (attackSlider);
+    addAndMakeVisible (decaySlider);
+    addAndMakeVisible (sustainSlider);
+    addAndMakeVisible (releaseSlider);
+
+    addAndMakeVisible (noiseLabel);
+    noiseSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
+    addAndMakeVisible (noiseSlider);
+
     setResizable (true, true);
     setSize (800, 800);
 
@@ -323,6 +399,15 @@ void PluginEditor::resized()
     ratio2Slider.setBounds (bounds.removeFromTop (50).reduced (5));
     ratio3Slider.setBounds (bounds.removeFromTop (50).reduced (5));
     ratio4Slider.setBounds (bounds.removeFromTop (50).reduced (5));
+
+    // Envelope sliders
+    envelopeLabel.setBounds (bounds.removeFromTop (50).reduced (5));
+    attackSlider.setBounds (bounds.removeFromTop (50).reduced (5));
+    decaySlider.setBounds (bounds.removeFromTop (50).reduced (5));
+    sustainSlider.setBounds (bounds.removeFromTop (50).reduced (5));
+    releaseSlider.setBounds (bounds.removeFromTop (50).reduced (5));
+    noiseLabel.setBounds (bounds.removeFromTop (50).reduced (5));
+    noiseSlider.setBounds (bounds.removeFromTop (50).reduced (5));
 }
 
 void PluginEditor::timerCallback()

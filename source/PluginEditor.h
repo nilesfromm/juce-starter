@@ -59,6 +59,20 @@ private:
     juce::SliderParameterAttachment ratio3SliderAttachment;
     juce::SliderParameterAttachment ratio4SliderAttachment;
 
+    juce::Label envelopeLabel { "envelope label", "Envelope" };
+    juce::Slider attackSlider { "attack slider" };
+    juce::Slider decaySlider { "decay slider" };
+    juce::Slider sustainSlider { "sustain slider" };
+    juce::Slider releaseSlider { "release slider" };
+    juce::SliderParameterAttachment attackSliderAttachment;
+    juce::SliderParameterAttachment decaySliderAttachment;
+    juce::SliderParameterAttachment sustainSliderAttachment;
+    juce::SliderParameterAttachment releaseSliderAttachment;
+
+    juce::Label noiseLabel { "noise label", "Noise" };
+    juce::Slider noiseSlider { "noise slider" };
+    juce::SliderParameterAttachment noiseSliderAttachment;
+
     juce::WebSliderRelay webGain1Relay;
     juce::WebSliderRelay webGain2Relay;
     juce::WebSliderRelay webGain3Relay;
@@ -67,6 +81,12 @@ private:
     juce::WebSliderRelay webRatio2Relay;
     juce::WebSliderRelay webRatio3Relay;
     juce::WebSliderRelay webRatio4Relay;
+
+    juce::WebSliderRelay webAttackRelay;
+    juce::WebSliderRelay webDecayRelay;
+    juce::WebSliderRelay webSustainRelay;
+    juce::WebSliderRelay webReleaseRelay;
+    juce::WebSliderRelay webNoiseRelay;
 
     juce::WebBrowserComponent webView;
 
@@ -78,6 +98,12 @@ private:
     juce::WebSliderParameterAttachment webRatio2SliderAttachment;
     juce::WebSliderParameterAttachment webRatio3SliderAttachment;
     juce::WebSliderParameterAttachment webRatio4SliderAttachment;
+
+    juce::WebSliderParameterAttachment webAttackSliderAttachment;
+    juce::WebSliderParameterAttachment webDecaySliderAttachment;
+    juce::WebSliderParameterAttachment webSustainSliderAttachment;
+    juce::WebSliderParameterAttachment webReleaseSliderAttachment;
+    juce::WebSliderParameterAttachment webNoiseSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
