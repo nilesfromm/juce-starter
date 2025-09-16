@@ -88,7 +88,8 @@ void Synth::midiMessage (uint8_t data0, uint8_t data1, uint8_t data2)
 
 void Synth::noteOn (int note, int velocity)
 {
-    startVoice (0, note, velocity);
+    int v = findFreeVoice();
+    startVoice (v, note, velocity);
 }
 
 void Synth::startVoice (int v, int note, int velocity)
@@ -112,9 +113,28 @@ void Synth::startVoice (int v, int note, int velocity)
 
 void Synth::noteOff (int note)
 {
-    Voice& voice = voices[0];
-    if (voice.note == note)
+    for (int v = 0; v < MAX_VOICES; v++)
     {
-        voice.env.release();
+        if (voices[v].note == note)
+        {
+            voices[v].env.release();
+            voices[v].note = 0;
+        }
     }
+}
+
+int Synth::findFreeVoice() const
+{
+    int v = 0;
+    float l = 100.0f;
+
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (voices[i].env.level < l && !voices[i].env.isActive())
+        {
+            l = voices[i].env.level;
+            v = i;
+        }
+    }
+    return v;
 }

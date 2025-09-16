@@ -19,6 +19,7 @@ public:
     static constexpr int MAX_VOICES = 8;
     int numVoices = MAX_VOICES;
 
+    float volumeTrim;
     float envAttack;
     float envDecay;
     float envSustain;
@@ -26,6 +27,7 @@ public:
 
 private:
     float sampleRate;
+    int findFreeVoice() const;
     std::array<Voice, MAX_VOICES> voices;
     void noteOn (int note, int velocity);
     void noteOff (int note);
