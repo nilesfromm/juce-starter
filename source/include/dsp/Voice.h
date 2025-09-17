@@ -6,25 +6,34 @@
 struct Voice
 {
     int note;
-    Oscillator osc;
-    Envelope env;
+    Oscillator h1;
+    Oscillator h2;
+    Oscillator h3;
+    Envelope env1;
+    Envelope env2;
+    Envelope env3;
 
     void reset()
     {
         note = 0;
-        osc.reset();
-        env.reset();
+        h1.reset();
+        h2.reset();
+        h3.reset();
+        env1.reset();
+        env2.reset();
+        env3.reset();
     }
 
     void release()
     {
-        env.release();
+        env1.release();
+        env2.release();
+        env3.release();
     }
 
     float render (float input)
     {
-        float sample = osc.nextSample() + input;
-        float envelope = env.nextValue();
-        return sample * envelope;
+        float sample = ((h1.nextSample() * env1.nextValue()) + (h2.nextSample() * env2.nextValue()) + (h3.nextSample() * env3.nextValue())) / 4.0f + input;
+        return sample;
     }
 };

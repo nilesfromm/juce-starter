@@ -125,8 +125,8 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     parametersChanged.store (true);
     reset();
 
-    for (int i = 0; i < 4; i++)
-        osc[i].setSampleRate (sampleRate);
+    // for (int i = 0; i < 4; i++)
+    //     osc[i].setSampleRate (sampleRate);
 }
 
 void PluginProcessor::releaseResources()
@@ -169,20 +169,53 @@ void PluginProcessor::updateParameters()
     float sampleRate = float (getSampleRate());
     float inverseSampleRate = 1.0f / sampleRate;
 
-    synth.envAttack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.attackParam->get()));
+    synth.h1_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h1_attackParam->get()));
 
-    synth.envDecay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.decayParam->get()));
+    synth.h1_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h1_decayParam->get()));
 
-    synth.envSustain = parameters.sustainParam->get() / 100.0f;
+    synth.h1_sustain = parameters.h1_sustainParam->get() / 100.0f;
 
-    float envRelease = parameters.releaseParam->get();
-    if (envRelease < 1.0f)
+    float envRelease1 = parameters.h1_releaseParam->get();
+    if (envRelease1 < 1.0f)
     {
-        synth.envRelease = 0.75f;
+        synth.h1_release = 0.75f;
     }
     else
     {
-        synth.envRelease = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease));
+        synth.h1_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease1));
+    }
+
+    synth.h2_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h2_attackParam->get()));
+
+    synth.h2_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h2_decayParam->get()));
+
+    synth.h2_sustain = parameters.h2_sustainParam->get() / 100.0f;
+
+    float envRelease2 = parameters.h2_releaseParam->get();
+    if (envRelease2 < 1.0f)
+    {
+        synth.h2_release = 0.75f;
+    }
+    else
+    {
+        synth.h2_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease2));
+    }
+
+    synth.h3_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h3_attackParam->get()));
+
+    synth.h3_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h3_decayParam->get()));
+
+    synth.h3_sustain = parameters.h3_sustainParam->get() / 100.0f;
+
+    float envRelease3 = parameters.h3_releaseParam->get();
+
+    if (envRelease3 < 1.0f)
+    {
+        synth.h3_release = 0.75f;
+    }
+    else
+    {
+        synth.h3_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease3));
     }
 
     float noiseMix = parameters.noiseParam->get();

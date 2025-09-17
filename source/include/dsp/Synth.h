@@ -20,10 +20,21 @@ public:
     int numVoices = MAX_VOICES;
 
     float volumeTrim;
-    float envAttack;
-    float envDecay;
-    float envSustain;
-    float envRelease;
+
+    float h1_attack;
+    float h1_decay;
+    float h1_sustain;
+    float h1_release;
+
+    float h2_attack;
+    float h2_decay;
+    float h2_sustain;
+    float h2_release;
+
+    float h3_attack;
+    float h3_decay;
+    float h3_sustain;
+    float h3_release;
 
 private:
     float sampleRate;

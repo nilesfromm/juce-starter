@@ -39,7 +39,7 @@ void Synth::render (float** outputBuffers, int sampleCount)
         for (int v = 0; v < MAX_VOICES; v++)
         {
             Voice& voice = voices[v];
-            if (voice.env.isActive())
+            if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive())
             {
                 float output = voice.render (noise);
                 outputLeft += output;
@@ -55,9 +55,9 @@ void Synth::render (float** outputBuffers, int sampleCount)
     for (int v = 0; v < MAX_VOICES; v++)
     {
         Voice& voice = voices[v];
-        if (!voice.env.isActive())
+        if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive())
         {
-            voice.env.reset();
+            voice.env1.reset();
         }
     }
 
@@ -95,20 +95,42 @@ void Synth::noteOn (int note, int velocity)
 void Synth::startVoice (int v, int note, int velocity)
 {
     // float freq = 440.0f * exp2 (float (note - 69) / 12.0f);
-    float freq = 8.1758 * exp (0.057762265046662 * float (note));
+    float baseFreq = 8.1758 * exp (0.057762265046662 * float (note));
 
     Voice& voice = voices[v];
     voice.note = note;
-    voice.osc.amp = (velocity / 127.0f) * 0.5f;
-    voice.osc.inc = freq / sampleRate;
-    voice.osc.reset();
+    voice.h1.amp = (velocity / 127.0f) * 0.5f;
+    voice.h1.inc = baseFreq / sampleRate;
+    voice.h1.reset();
 
-    Envelope& env = voice.env;
-    env.attackMultiplier = envAttack;
-    env.decayMultiplier = envDecay;
-    env.sustainLevel = envSustain;
-    env.releaseMultiplier = envRelease;
-    env.attack();
+    voice.h2.amp = (velocity / 127.0f) * 0.5f;
+    voice.h2.inc = baseFreq * 2.0f / sampleRate;
+    voice.h2.reset();
+
+    voice.h3.amp = (velocity / 127.0f) * 0.5f;
+    voice.h3.inc = baseFreq * 3.0f / sampleRate;
+    voice.h3.reset();
+
+    Envelope& env1 = voice.env1;
+    env1.attackMultiplier = h1_attack;
+    env1.decayMultiplier = h1_decay;
+    env1.sustainLevel = h1_sustain;
+    env1.releaseMultiplier = h1_release;
+    env1.attack();
+
+    Envelope& env2 = voice.env2;
+    env2.attackMultiplier = h2_attack;
+    env2.decayMultiplier = h2_decay;
+    env2.sustainLevel = h2_sustain;
+    env2.releaseMultiplier = h2_release;
+    env2.attack();
+
+    Envelope& env3 = voice.env3;
+    env3.attackMultiplier = h3_attack;
+    env3.decayMultiplier = h3_decay;
+    env3.sustainLevel = h3_sustain;
+    env3.releaseMultiplier = h3_release;
+    env3.attack();
 }
 
 void Synth::noteOff (int note)
@@ -117,7 +139,9 @@ void Synth::noteOff (int note)
     {
         if (voices[v].note == note)
         {
-            voices[v].env.release();
+            voices[v].env1.release();
+            voices[v].env2.release();
+            voices[v].env3.release();
             voices[v].note = 0;
         }
     }
@@ -130,9 +154,9 @@ int Synth::findFreeVoice() const
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        if (voices[i].env.level < l && !voices[i].env.isActive())
+        if (voices[i].env1.level < l && !voices[i].env1.isInAttack())
         {
-            l = voices[i].env.level;
+            l = voices[i].env1.level;
             v = i;
         }
     }

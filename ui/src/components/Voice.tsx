@@ -33,7 +33,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           {isRatioLocked ? (
             <NumberInput
               key={`${voiceId}-ratio`}
-              id="frequency"
+              id={`${voiceId}_frequency`}
               label="R"
               min={0}
               max={1}
@@ -42,7 +42,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           ) : (
             <NumberInput
               key={`${voiceId}-frequency`}
-              id="frequency"
+              id={`${voiceId}_frequency`}
               label="F"
               min={0}
               max={1}
@@ -52,7 +52,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
 
           <NumberInput
             key={`${voiceId}-attack`}
-            id="attack"
+            id={`${voiceId}_attack`}
             label="A"
             onChange={setAttack}
             min={0}
@@ -61,7 +61,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           />
           <NumberInput
             key={`${voiceId}-sustain`}
-            id="sustain"
+            id={`${voiceId}_sustain`}
             label="S"
             onChange={setSustain}
             min={0}
@@ -70,7 +70,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           />
           <NumberInput
             key={`${voiceId}-gain`}
-            id="gain"
+            id={`${voiceId}_gain`}
             label="G"
             min={0}
             max={1}
@@ -78,7 +78,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           />
           <NumberInput
             key={`${voiceId}-decay`}
-            id="decay"
+            id={`${voiceId}_decay`}
             label="D"
             onChange={setDecay}
             min={0}
@@ -87,7 +87,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           />
           <NumberInput
             key={`${voiceId}-release`}
-            id="release"
+            id={`${voiceId}_release`}
             label="R"
             onChange={setRelease}
             min={0}

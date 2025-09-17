@@ -24,54 +24,11 @@ public:
 private:
     using Resource = juce::WebBrowserComponent::Resource;
     std::optional<Resource> getResource (const juce::String& url) const;
-    void nativeFunction (
-        const juce::Array<juce::var>& args,
-        juce::WebBrowserComponent::NativeFunctionCompletion completion);
-
-    juce::TextButton runJavaScriptButton { "Run some JavaScript" };
-    juce::TextButton emitJavaScriptEventButton { "Emit JavaScript event" };
-    juce::Label labelUpdatedFromJavaScript { "label",
-        "To be updated from JavaScript" };
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PluginProcessor& processorRef;
     std::unique_ptr<melatonin::Inspector> inspector;
-    juce::TextButton inspectButton { "Inspect the UI" };
-
-    juce::Label gainLabel { "gain label", "Gain" };
-    juce::Slider gain1Slider { "gain1 slider" };
-    juce::Slider gain2Slider { "gain2 slider" };
-    juce::Slider gain3Slider { "gain3 slider" };
-    juce::Slider gain4Slider { "gain4 slider" };
-    juce::SliderParameterAttachment gain1SliderAttachment;
-    juce::SliderParameterAttachment gain2SliderAttachment;
-    juce::SliderParameterAttachment gain3SliderAttachment;
-    juce::SliderParameterAttachment gain4SliderAttachment;
-
-    juce::Label ratioLabel { "ratio label", "Ratio" };
-    juce::Slider ratio1Slider { "ratio1 slider" };
-    juce::Slider ratio2Slider { "ratio2 slider" };
-    juce::Slider ratio3Slider { "ratio3 slider" };
-    juce::Slider ratio4Slider { "ratio4 slider" };
-    juce::SliderParameterAttachment ratio1SliderAttachment;
-    juce::SliderParameterAttachment ratio2SliderAttachment;
-    juce::SliderParameterAttachment ratio3SliderAttachment;
-    juce::SliderParameterAttachment ratio4SliderAttachment;
-
-    juce::Label envelopeLabel { "envelope label", "Envelope" };
-    juce::Slider attackSlider { "attack slider" };
-    juce::Slider decaySlider { "decay slider" };
-    juce::Slider sustainSlider { "sustain slider" };
-    juce::Slider releaseSlider { "release slider" };
-    juce::SliderParameterAttachment attackSliderAttachment;
-    juce::SliderParameterAttachment decaySliderAttachment;
-    juce::SliderParameterAttachment sustainSliderAttachment;
-    juce::SliderParameterAttachment releaseSliderAttachment;
-
-    juce::Label noiseLabel { "noise label", "Noise" };
-    juce::Slider noiseSlider { "noise slider" };
-    juce::SliderParameterAttachment noiseSliderAttachment;
 
     juce::WebSliderRelay webGain1Relay;
     juce::WebSliderRelay webGain2Relay;
@@ -82,10 +39,21 @@ private:
     juce::WebSliderRelay webRatio3Relay;
     juce::WebSliderRelay webRatio4Relay;
 
-    juce::WebSliderRelay webAttackRelay;
-    juce::WebSliderRelay webDecayRelay;
-    juce::WebSliderRelay webSustainRelay;
-    juce::WebSliderRelay webReleaseRelay;
+    juce::WebSliderRelay webA1Relay;
+    juce::WebSliderRelay webD1Relay;
+    juce::WebSliderRelay webS1Relay;
+    juce::WebSliderRelay webR1Relay;
+
+    juce::WebSliderRelay webA2Relay;
+    juce::WebSliderRelay webD2Relay;
+    juce::WebSliderRelay webS2Relay;
+    juce::WebSliderRelay webR2Relay;
+
+    juce::WebSliderRelay webA3Relay;
+    juce::WebSliderRelay webD3Relay;
+    juce::WebSliderRelay webS3Relay;
+    juce::WebSliderRelay webR3Relay;
+
     juce::WebSliderRelay webNoiseRelay;
 
     juce::WebBrowserComponent webView;
@@ -99,10 +67,21 @@ private:
     juce::WebSliderParameterAttachment webRatio3SliderAttachment;
     juce::WebSliderParameterAttachment webRatio4SliderAttachment;
 
-    juce::WebSliderParameterAttachment webAttackSliderAttachment;
-    juce::WebSliderParameterAttachment webDecaySliderAttachment;
-    juce::WebSliderParameterAttachment webSustainSliderAttachment;
-    juce::WebSliderParameterAttachment webReleaseSliderAttachment;
+    juce::WebSliderParameterAttachment webA1Attachment;
+    juce::WebSliderParameterAttachment webD1Attachment;
+    juce::WebSliderParameterAttachment webS1Attachment;
+    juce::WebSliderParameterAttachment webR1Attachment;
+
+    juce::WebSliderParameterAttachment webA2Attachment;
+    juce::WebSliderParameterAttachment webD2Attachment;
+    juce::WebSliderParameterAttachment webS2Attachment;
+    juce::WebSliderParameterAttachment webR2Attachment;
+
+    juce::WebSliderParameterAttachment webA3Attachment;
+    juce::WebSliderParameterAttachment webD3Attachment;
+    juce::WebSliderParameterAttachment webS3Attachment;
+    juce::WebSliderParameterAttachment webR3Attachment;
+
     juce::WebSliderParameterAttachment webNoiseSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)

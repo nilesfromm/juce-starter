@@ -100,73 +100,6 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      gain1SliderAttachment {
-          *processorRef.getState().getParameter (id::gain1.getParamID()),
-          gain1Slider,
-          nullptr
-      },
-      gain2SliderAttachment {
-          *processorRef.getState().getParameter (id::gain2.getParamID()),
-          gain2Slider,
-          nullptr
-      },
-      gain3SliderAttachment {
-          *processorRef.getState().getParameter (id::gain3.getParamID()),
-          gain3Slider,
-          nullptr
-      },
-      gain4SliderAttachment {
-          *processorRef.getState().getParameter (id::gain4.getParamID()),
-          gain4Slider,
-          nullptr
-      },
-      ratio1SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio1.getParamID()),
-          ratio1Slider,
-          nullptr
-      },
-      ratio2SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio2.getParamID()),
-          ratio2Slider,
-          nullptr
-      },
-      ratio3SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio3.getParamID()),
-          ratio3Slider,
-          nullptr
-      },
-      ratio4SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio4.getParamID()),
-          ratio4Slider,
-          nullptr
-      },
-      // Envelope sliders
-      attackSliderAttachment {
-          *processorRef.getState().getParameter (id::attack.getParamID()),
-          attackSlider,
-          nullptr
-      },
-      decaySliderAttachment {
-          *processorRef.getState().getParameter (id::decay.getParamID()),
-          decaySlider,
-          nullptr
-      },
-      sustainSliderAttachment {
-          *processorRef.getState().getParameter (id::sustain.getParamID()),
-          sustainSlider,
-          nullptr
-      },
-      releaseSliderAttachment {
-          *processorRef.getState().getParameter (id::release.getParamID()),
-          releaseSlider,
-          nullptr
-      },
-      noiseSliderAttachment {
-          *processorRef.getState().getParameter (id::noise.getParamID()),
-          noiseSlider,
-          nullptr
-      },
-
       webGain1Relay { id::gain1.getParamID() },
       webGain2Relay { id::gain2.getParamID() },
       webGain3Relay { id::gain3.getParamID() },
@@ -176,10 +109,21 @@ PluginEditor::PluginEditor (PluginProcessor& p)
       webRatio3Relay { id::ratio3.getParamID() },
       webRatio4Relay { id::ratio4.getParamID() },
 
-      webAttackRelay { id::attack.getParamID() },
-      webDecayRelay { id::decay.getParamID() },
-      webSustainRelay { id::sustain.getParamID() },
-      webReleaseRelay { id::release.getParamID() },
+      webA1Relay { id::h1_attack.getParamID() },
+      webD1Relay { id::h1_decay.getParamID() },
+      webS1Relay { id::h1_sustain.getParamID() },
+      webR1Relay { id::h1_release.getParamID() },
+
+      webA2Relay { id::h2_attack.getParamID() },
+      webD2Relay { id::h2_decay.getParamID() },
+      webS2Relay { id::h2_sustain.getParamID() },
+      webR2Relay { id::h2_release.getParamID() },
+
+      webA3Relay { id::h3_attack.getParamID() },
+      webD3Relay { id::h3_decay.getParamID() },
+      webS3Relay { id::h3_sustain.getParamID() },
+      webR3Relay { id::h3_release.getParamID() },
+
       webNoiseRelay { id::noise.getParamID() },
 
       webView {
@@ -202,22 +146,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
               .withInitialisationData ("vendor", JUCE_COMPANY_NAME)
               .withInitialisationData ("pluginName", JUCE_PRODUCT_NAME)
               .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION)
-              .withUserScript ("console.log(\"C++ backend here: This is run "
-                               "before any other loading happens\");")
-              .withEventListener (
-                  "exampleJavaScriptEvent",
-                  [this] (juce::var objectFromFrontend) {
-                      labelUpdatedFromJavaScript.setText (
-                          "example JavaScript event occurred with value " + objectFromFrontend.getProperty ("emittedCount", 0).toString(),
-                          juce::dontSendNotification);
-                  })
-              .withNativeFunction (
-                  juce::Identifier { "nativeFunction" },
-                  [this] (const juce::Array<juce::var>& args,
-                      juce::WebBrowserComponent::NativeFunctionCompletion
-                          completion) {
-                      nativeFunction (args, std::move (completion));
-                  })
+
               .withOptionsFrom (webGain1Relay)
               .withOptionsFrom (webGain2Relay)
               .withOptionsFrom (webGain3Relay)
@@ -226,10 +155,18 @@ PluginEditor::PluginEditor (PluginProcessor& p)
               .withOptionsFrom (webRatio2Relay)
               .withOptionsFrom (webRatio3Relay)
               .withOptionsFrom (webRatio4Relay)
-              .withOptionsFrom (webAttackRelay)
-              .withOptionsFrom (webDecayRelay)
-              .withOptionsFrom (webSustainRelay)
-              .withOptionsFrom (webReleaseRelay)
+              .withOptionsFrom (webA1Relay)
+              .withOptionsFrom (webD1Relay)
+              .withOptionsFrom (webS1Relay)
+              .withOptionsFrom (webR1Relay)
+              .withOptionsFrom (webA2Relay)
+              .withOptionsFrom (webD2Relay)
+              .withOptionsFrom (webS2Relay)
+              .withOptionsFrom (webR2Relay)
+              .withOptionsFrom (webA3Relay)
+              .withOptionsFrom (webD3Relay)
+              .withOptionsFrom (webS3Relay)
+              .withOptionsFrom (webR3Relay)
               .withOptionsFrom (webNoiseRelay)
       },
       webGain1SliderAttachment {
@@ -272,29 +209,69 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webRatio4Relay,
           nullptr
       },
-      webAttackSliderAttachment {
-          *processorRef.getState().getParameter (id::attack.getParamID()),
-          webAttackRelay,
+      webA1Attachment {
+          *processorRef.getState().getParameter (id::h1_attack.getParamID()),
+          webA1Relay,
           nullptr
       },
-      webDecaySliderAttachment {
-          *processorRef.getState().getParameter (id::decay.getParamID()),
-          webDecayRelay,
+      webD1Attachment {
+          *processorRef.getState().getParameter (id::h1_decay.getParamID()),
+          webD1Relay,
           nullptr
       },
-      webSustainSliderAttachment {
-          *processorRef.getState().getParameter (id::sustain.getParamID()),
-          webSustainRelay,
+      webS1Attachment {
+          *processorRef.getState().getParameter (id::h1_sustain.getParamID()),
+          webS1Relay,
           nullptr
       },
-      webReleaseSliderAttachment {
-          *processorRef.getState().getParameter (id::release.getParamID()),
-          webReleaseRelay,
+      webR1Attachment {
+          *processorRef.getState().getParameter (id::h1_release.getParamID()),
+          webR1Relay,
+          nullptr
+      },
+      webA2Attachment {
+          *processorRef.getState().getParameter (id::h2_attack.getParamID()),
+          webA2Relay,
+          nullptr
+      },
+      webD2Attachment {
+          *processorRef.getState().getParameter (id::h2_decay.getParamID()),
+          webD2Relay,
+          nullptr
+      },
+      webS2Attachment {
+          *processorRef.getState().getParameter (id::h2_sustain.getParamID()),
+          webS2Relay,
+          nullptr
+      },
+      webR2Attachment {
+          *processorRef.getState().getParameter (id::h2_release.getParamID()),
+          webR2Relay,
           nullptr
       },
       webNoiseSliderAttachment {
           *processorRef.getState().getParameter (id::noise.getParamID()),
           webNoiseRelay,
+          nullptr
+      },
+      webA3Attachment {
+          *processorRef.getState().getParameter (id::h3_attack.getParamID()),
+          webA3Relay,
+          nullptr
+      },
+      webD3Attachment {
+          *processorRef.getState().getParameter (id::h3_decay.getParamID()),
+          webD3Relay,
+          nullptr
+      },
+      webS3Attachment {
+          *processorRef.getState().getParameter (id::h3_sustain.getParamID()),
+          webS3Relay,
+          nullptr
+      },
+      webR3Attachment {
+          *processorRef.getState().getParameter (id::h3_release.getParamID()),
+          webR3Relay,
           nullptr
       }
 {
@@ -311,67 +288,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // This can be used for hot reloading
     webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
 
-    runJavaScriptButton.onClick = [this] {
-        constexpr auto JAVASCRIPT_TO_RUN { "console.log(\"Hello from C++!\");" };
-        webView.evaluateJavascript (
-            JAVASCRIPT_TO_RUN,
-            [] (juce::WebBrowserComponent::EvaluationResult result) {
-                if (const auto* resultPtr = result.getResult())
-                {
-                    std::cout << "JavaScript evaluation result: "
-                              << resultPtr->toString() << std::endl;
-                }
-                else
-                {
-                    std::cout << "JavaScript evaluation failed because "
-                              << result.getError()->message << std::endl;
-                }
-            });
-    };
-    addAndMakeVisible (runJavaScriptButton);
-
-    emitJavaScriptEventButton.onClick = [this] {
-        static const juce::var valueToEmit { 42.0 };
-        webView.emitEventIfBrowserIsVisible (getExampleEventId(), valueToEmit);
-    };
-    addAndMakeVisible (emitJavaScriptEventButton);
-
-    addAndMakeVisible (labelUpdatedFromJavaScript);
-
-    addAndMakeVisible (gainLabel);
-    gain1Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    gain2Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    gain3Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    gain4Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    addAndMakeVisible (gain1Slider);
-    addAndMakeVisible (gain2Slider);
-    addAndMakeVisible (gain3Slider);
-    addAndMakeVisible (gain4Slider);
-
-    addAndMakeVisible (ratioLabel);
-    ratio1Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    ratio2Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    ratio3Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    ratio4Slider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    addAndMakeVisible (ratio1Slider);
-    addAndMakeVisible (ratio2Slider);
-    addAndMakeVisible (ratio3Slider);
-    addAndMakeVisible (ratio4Slider);
-
-    addAndMakeVisible (envelopeLabel);
-    attackSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    decaySlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    sustainSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    releaseSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    addAndMakeVisible (attackSlider);
-    addAndMakeVisible (decaySlider);
-    addAndMakeVisible (sustainSlider);
-    addAndMakeVisible (releaseSlider);
-
-    addAndMakeVisible (noiseLabel);
-    noiseSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBar);
-    addAndMakeVisible (noiseSlider);
-
     setResizable (true, true);
     setSize (800, 800);
 
@@ -385,29 +301,7 @@ PluginEditor::~PluginEditor()
 void PluginEditor::resized()
 {
     auto bounds = getBounds();
-    webView.setBounds (bounds.removeFromRight (getWidth() / 2));
-    runJavaScriptButton.setBounds (bounds.removeFromTop (50).reduced (5));
-    emitJavaScriptEventButton.setBounds (bounds.removeFromTop (50).reduced (5));
-    labelUpdatedFromJavaScript.setBounds (bounds.removeFromTop (50).reduced (5));
-    gainLabel.setBounds (bounds.removeFromTop (50).reduced (5));
-    gain1Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    gain2Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    gain3Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    gain4Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    ratioLabel.setBounds (bounds.removeFromTop (50).reduced (5));
-    ratio1Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    ratio2Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    ratio3Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-    ratio4Slider.setBounds (bounds.removeFromTop (50).reduced (5));
-
-    // Envelope sliders
-    envelopeLabel.setBounds (bounds.removeFromTop (50).reduced (5));
-    attackSlider.setBounds (bounds.removeFromTop (50).reduced (5));
-    decaySlider.setBounds (bounds.removeFromTop (50).reduced (5));
-    sustainSlider.setBounds (bounds.removeFromTop (50).reduced (5));
-    releaseSlider.setBounds (bounds.removeFromTop (50).reduced (5));
-    noiseLabel.setBounds (bounds.removeFromTop (50).reduced (5));
-    noiseSlider.setBounds (bounds.removeFromTop (50).reduced (5));
+    webView.setBounds (bounds);
 }
 
 void PluginEditor::timerCallback()
@@ -445,20 +339,4 @@ auto PluginEditor::getResource (const juce::String& url) const
     }
 
     return std::nullopt;
-}
-
-void PluginEditor::nativeFunction (
-    const juce::Array<juce::var>& args,
-    juce::WebBrowserComponent::NativeFunctionCompletion completion)
-{
-    using namespace std::views;
-    juce::String concatenatedString;
-    for (const auto& string : args | transform (&juce::var::toString))
-    {
-        concatenatedString += string;
-    }
-    labelUpdatedFromJavaScript.setText (
-        "Native function called with args: " + concatenatedString,
-        juce::dontSendNotification);
-    completion ("nativeFunction callback: All OK!");
 }

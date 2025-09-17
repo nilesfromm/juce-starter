@@ -82,7 +82,7 @@ private:
 
     // Custom DSP ================================================================
     Synth synth;
-    SineOsc osc[4];
+    // SineOsc osc[4];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
