@@ -1,9 +1,9 @@
 import "./App.css";
 import Slider from "./components/Slider";
+import Voice from "./components/Voice";
 import * as Juce from "./juce/index.js";
 
 function App() {
-  
   console.log("JUCE frontend library successfully imported");
   console.log(Juce);
   const nativeFunction = Juce.getNativeFunction("nativeFunction") as (
@@ -30,17 +30,9 @@ function App() {
     });
   };
 
-
-
   return (
-    <div className="size-full h-screen flex flex-col gap-2 items-center justify-center bg-black text-white">
-      <p className="text-2xl">hello juce</p>
-      <br />
-      <p>{data.vendor ?? "no vendor"}</p>
-      <p>{data.pluginName ?? "no plugin name"}</p>
-      <p>{data.pluginVersion ?? "no plugin version"}</p>
-      <br />
-      <button
+    <div className="size-full h-screen flex flex-col gap-2 items-center justify-center bg-[#F2F2F2] text-[#333333]">
+      {/* <button
         className="border border-white rounded-lg px-2 py-1 hover:cursor-pointer hover:bg-white/20 transition-colors duration-200"
         onClick={handleButtonClick}
       >
@@ -51,11 +43,12 @@ function App() {
         onClick={handleNativeFunctionButtonClick}
       >
         Native Function
-      </button>
-      <Slider sliderId="attack" />
+      </button> */}
+      <Voice voiceId="h1" voiceName="H1" />
+      {/* <Slider sliderId="attack" />
       <Slider sliderId="decay" />
       <Slider sliderId="sustain" />
-      <Slider sliderId="release" />
+      <Slider sliderId="release" /> */}
       <Slider sliderId="noise" />
     </div>
   );

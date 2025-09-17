@@ -34,9 +34,7 @@ public:
     [[nodiscard]] static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout (Parameters&);
 
     void prepareToPlay (double sampleRate) noexcept;
-    void update() noexcept;
     void reset() noexcept;
-    void smooth() noexcept;
 
     float gain1 = 0.0f;
     float gain2 = 0.0f;
@@ -73,20 +71,4 @@ public:
     juce::AudioParameterFloat* noiseParam;
 
 private:
-    juce::LinearSmoothedValue<float> gain1Smoothed;
-    juce::LinearSmoothedValue<float> gain2Smoothed;
-    juce::LinearSmoothedValue<float> gain3Smoothed;
-    juce::LinearSmoothedValue<float> gain4Smoothed;
-
-    juce::LinearSmoothedValue<float> ratio1Smoothed;
-    juce::LinearSmoothedValue<float> ratio2Smoothed;
-    juce::LinearSmoothedValue<float> ratio3Smoothed;
-    juce::LinearSmoothedValue<float> ratio4Smoothed;
-
-    juce::LinearSmoothedValue<float> attackSmoothed;
-    juce::LinearSmoothedValue<float> decaySmoothed;
-    juce::LinearSmoothedValue<float> sustainSmoothed;
-    juce::LinearSmoothedValue<float> releaseSmoothed;
-
-    juce::LinearSmoothedValue<float> noiseSmoothed;
 };
