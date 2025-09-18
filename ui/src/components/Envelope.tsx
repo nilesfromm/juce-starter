@@ -16,7 +16,7 @@ const Envelope = ({ attack, decay, sustain, release }: EnvelopeProps) => {
   const p4y = 0;
 
   return (
-    <div className="flex w-full h-[52px] bg-[#D9D9D9]">
+    <div className="flex w-[252px] h-[52px] bg-[#D9D9D9]">
       <svg
         width="100%"
         height="100%"

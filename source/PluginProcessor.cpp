@@ -218,6 +218,23 @@ void PluginProcessor::updateParameters()
         synth.h3_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease3));
     }
 
+    synth.h4_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h4_attackParam->get()));
+
+    synth.h4_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h4_decayParam->get()));
+
+    synth.h4_sustain = parameters.h4_sustainParam->get() / 100.0f;
+
+    float envRelease4 = parameters.h4_releaseParam->get();
+
+    if (envRelease4 < 1.0f)
+    {
+        synth.h4_release = 0.75f;
+    }
+    else
+    {
+        synth.h4_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease4));
+    }
+
     float noiseMix = parameters.noiseParam->get();
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;

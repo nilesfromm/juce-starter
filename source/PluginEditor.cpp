@@ -317,8 +317,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // This can be used for hot reloading
     webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
 
-    setResizable (true, true);
-    setSize (800, 800);
+    // setResizable (true, true);
+    setSize (544, 256);
 
     startTimer (60);
 }

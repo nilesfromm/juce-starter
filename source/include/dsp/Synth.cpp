@@ -58,6 +58,9 @@ void Synth::render (float** outputBuffers, int sampleCount)
         if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive() && !voice.env4.isActive())
         {
             voice.env1.reset();
+            voice.env2.reset();
+            voice.env3.reset();
+            voice.env4.reset();
         }
     }
 

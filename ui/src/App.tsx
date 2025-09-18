@@ -31,7 +31,7 @@ function App() {
   };
 
   return (
-    <div className="size-full h-screen flex flex-col gap-2 items-center justify-center bg-[#F2F2F2] text-[#333333]">
+    <div className="grid grid-cols-2 gap-2 items-center justify-center bg-[#F2F2F2] text-[#333333] p-4">
       {/* <button
         className="border border-white rounded-lg px-2 py-1 hover:cursor-pointer hover:bg-white/20 transition-colors duration-200"
         onClick={handleButtonClick}
@@ -52,7 +52,7 @@ function App() {
       <Slider sliderId="decay" />
       <Slider sliderId="sustain" />
       <Slider sliderId="release" /> */}
-      <Slider sliderId="noise" />
+      {/* <Slider sliderId="noise" /> */}
     </div>
   );
 }
