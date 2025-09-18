@@ -47,6 +47,7 @@ function App() {
       <Voice voiceId="h1" voiceName="H1" />
       <Voice voiceId="h2" voiceName="H2" />
       <Voice voiceId="h3" voiceName="H3" />
+      <Voice voiceId="h4" voiceName="H4" />
       {/* <Slider sliderId="attack" />
       <Slider sliderId="decay" />
       <Slider sliderId="sustain" />

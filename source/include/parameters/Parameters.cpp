@@ -12,30 +12,34 @@ void Parameters::prepareToPlay (double sampleRate) noexcept
 
 void Parameters::reset() noexcept
 {
-    gain1 = 0.0f;
-    gain2 = 0.0f;
-    gain3 = 0.0f;
-    gain4 = 0.0f;
-
     ratio1 = 0.0f;
     ratio2 = 0.0f;
     ratio3 = 0.0f;
     ratio4 = 0.0f;
 
+    h1_gain = 0.0f;
     h1_attack = 0.0f;
     h1_decay = 0.0f;
     h1_sustain = 0.0f;
     h1_release = 0.0f;
 
+    h2_gain = 0.0f;
     h2_attack = 0.0f;
     h2_decay = 0.0f;
     h2_sustain = 0.0f;
     h2_release = 0.0f;
 
+    h3_gain = 0.0f;
     h3_attack = 0.0f;
     h3_decay = 0.0f;
     h3_sustain = 0.0f;
     h3_release = 0.0f;
+
+    h4_gain = 0.0f;
+    h4_attack = 0.0f;
+    h4_decay = 0.0f;
+    h4_sustain = 0.0f;
+    h4_release = 0.0f;
 
     noise = 0.0f;
 }
@@ -76,12 +80,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     using namespace juce;
     AudioProcessorValueTreeState::ParameterLayout layout;
 
-    // Gain parameters
-    addParameter (id::gain1, "gain1", createGainRange(), 0.25f, parameters.gain1Param, layout);
-    addParameter (id::gain2, "gain2", createGainRange(), 0.25f, parameters.gain2Param, layout);
-    addParameter (id::gain3, "gain3", createGainRange(), 0.25f, parameters.gain3Param, layout);
-    addParameter (id::gain4, "gain4", createGainRange(), 0.25f, parameters.gain4Param, layout);
-
     // Ratio parameters
     addParameter (id::ratio1, "ratio1", createRatioRange(), 0.5f, parameters.ratio1Param, layout);
     addParameter (id::ratio2, "ratio2", createRatioRange(), 1.0f, parameters.ratio2Param, layout);
@@ -89,20 +87,29 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     addParameter (id::ratio4, "ratio4", createRatioRange(), 4.0f, parameters.ratio4Param, layout);
 
     // Envelope parameters
+    addParameter (id::h1_gain, "h1_gain", createGainRange(), 0.25f, parameters.h1_gainParam, layout);
     addParameter (id::h1_attack, "h1_attack", createEnvelopeRange(), 2.0f, parameters.h1_attackParam, layout);
     addParameter (id::h1_decay, "h1_decay", createEnvelopeRange(), 30.0f, parameters.h1_decayParam, layout);
     addParameter (id::h1_sustain, "h1_sustain", createEnvelopeRange(), 0.0f, parameters.h1_sustainParam, layout);
     addParameter (id::h1_release, "h1_release", createEnvelopeRange(), 25.0f, parameters.h1_releaseParam, layout);
 
+    addParameter (id::h2_gain, "h2_gain", createGainRange(), 0.25f, parameters.h2_gainParam, layout);
     addParameter (id::h2_attack, "h2_attack", createEnvelopeRange(), 2.0f, parameters.h2_attackParam, layout);
     addParameter (id::h2_decay, "h2_decay", createEnvelopeRange(), 30.0f, parameters.h2_decayParam, layout);
     addParameter (id::h2_sustain, "h2_sustain", createEnvelopeRange(), 0.0f, parameters.h2_sustainParam, layout);
     addParameter (id::h2_release, "h2_release", createEnvelopeRange(), 25.0f, parameters.h2_releaseParam, layout);
 
+    addParameter (id::h3_gain, "h3_gain", createGainRange(), 0.25f, parameters.h3_gainParam, layout);
     addParameter (id::h3_attack, "h3_attack", createEnvelopeRange(), 2.0f, parameters.h3_attackParam, layout);
     addParameter (id::h3_decay, "h3_decay", createEnvelopeRange(), 30.0f, parameters.h3_decayParam, layout);
     addParameter (id::h3_sustain, "h3_sustain", createEnvelopeRange(), 0.0f, parameters.h3_sustainParam, layout);
     addParameter (id::h3_release, "h3_release", createEnvelopeRange(), 25.0f, parameters.h3_releaseParam, layout);
+
+    addParameter (id::h4_gain, "h4_gain", createGainRange(), 0.25f, parameters.h4_gainParam, layout);
+    addParameter (id::h4_attack, "h4_attack", createEnvelopeRange(), 2.0f, parameters.h4_attackParam, layout);
+    addParameter (id::h4_decay, "h4_decay", createEnvelopeRange(), 30.0f, parameters.h4_decayParam, layout);
+    addParameter (id::h4_sustain, "h4_sustain", createEnvelopeRange(), 0.0f, parameters.h4_sustainParam, layout);
+    addParameter (id::h4_release, "h4_release", createEnvelopeRange(), 25.0f, parameters.h4_releaseParam, layout);
 
     // Noise parameter
     addParameter (id::noise, "Noise", juce::NormalisableRange<float> { 0.f, 1.f, 0.01f, 1.0f }, 0.0f, parameters.noiseParam, layout);

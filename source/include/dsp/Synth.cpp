@@ -32,16 +32,16 @@ void Synth::render (float** outputBuffers, int sampleCount)
 
     for (int sample = 0; sample < sampleCount; sample++)
     {
-        float noise = noiseOsc.nextValue() * noiseMix;
+        float noise = noiseOsc.nextValue() * 0.16f;
         float outputLeft = 0.0f;
         float outputRight = 0.0f;
 
         for (int v = 0; v < MAX_VOICES; v++)
         {
             Voice& voice = voices[v];
-            if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive())
+            if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive() || voice.env4.isActive())
             {
-                float output = voice.render (noise);
+                float output = voice.render (noise, h1_gain, h2_gain, h3_gain, h4_gain);
                 outputLeft += output;
                 outputRight += output;
             }
@@ -55,7 +55,7 @@ void Synth::render (float** outputBuffers, int sampleCount)
     for (int v = 0; v < MAX_VOICES; v++)
     {
         Voice& voice = voices[v];
-        if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive())
+        if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive() && !voice.env4.isActive())
         {
             voice.env1.reset();
         }
@@ -108,7 +108,7 @@ void Synth::startVoice (int v, int note, int velocity)
     voice.h2.reset();
 
     voice.h3.amp = (velocity / 127.0f) * 0.5f;
-    voice.h3.inc = baseFreq * 3.0f / sampleRate;
+    voice.h3.inc = baseFreq * 4.0f / sampleRate;
     voice.h3.reset();
 
     Envelope& env1 = voice.env1;
@@ -131,6 +131,13 @@ void Synth::startVoice (int v, int note, int velocity)
     env3.sustainLevel = h3_sustain;
     env3.releaseMultiplier = h3_release;
     env3.attack();
+
+    Envelope& env4 = voice.env4;
+    env4.attackMultiplier = h4_attack;
+    env4.decayMultiplier = h4_decay;
+    env4.sustainLevel = h4_sustain;
+    env4.releaseMultiplier = h4_release;
+    env4.attack();
 }
 
 void Synth::noteOff (int note)
@@ -142,6 +149,7 @@ void Synth::noteOff (int note)
             voices[v].env1.release();
             voices[v].env2.release();
             voices[v].env3.release();
+            voices[v].env4.release();
             voices[v].note = 0;
         }
     }

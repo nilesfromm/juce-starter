@@ -100,29 +100,34 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      webGain1Relay { id::gain1.getParamID() },
-      webGain2Relay { id::gain2.getParamID() },
-      webGain3Relay { id::gain3.getParamID() },
-      webGain4Relay { id::gain4.getParamID() },
       webRatio1Relay { id::ratio1.getParamID() },
       webRatio2Relay { id::ratio2.getParamID() },
       webRatio3Relay { id::ratio3.getParamID() },
       webRatio4Relay { id::ratio4.getParamID() },
 
+      webGain1Relay { id::h1_gain.getParamID() },
       webA1Relay { id::h1_attack.getParamID() },
       webD1Relay { id::h1_decay.getParamID() },
       webS1Relay { id::h1_sustain.getParamID() },
       webR1Relay { id::h1_release.getParamID() },
 
+      webGain2Relay { id::h2_gain.getParamID() },
       webA2Relay { id::h2_attack.getParamID() },
       webD2Relay { id::h2_decay.getParamID() },
       webS2Relay { id::h2_sustain.getParamID() },
       webR2Relay { id::h2_release.getParamID() },
 
+      webGain3Relay { id::h3_gain.getParamID() },
       webA3Relay { id::h3_attack.getParamID() },
       webD3Relay { id::h3_decay.getParamID() },
       webS3Relay { id::h3_sustain.getParamID() },
       webR3Relay { id::h3_release.getParamID() },
+
+      webGain4Relay { id::h4_gain.getParamID() },
+      webA4Relay { id::h4_attack.getParamID() },
+      webD4Relay { id::h4_decay.getParamID() },
+      webS4Relay { id::h4_sustain.getParamID() },
+      webR4Relay { id::h4_release.getParamID() },
 
       webNoiseRelay { id::noise.getParamID() },
 
@@ -167,27 +172,11 @@ PluginEditor::PluginEditor (PluginProcessor& p)
               .withOptionsFrom (webD3Relay)
               .withOptionsFrom (webS3Relay)
               .withOptionsFrom (webR3Relay)
+              .withOptionsFrom (webA4Relay)
+              .withOptionsFrom (webD4Relay)
+              .withOptionsFrom (webS4Relay)
+              .withOptionsFrom (webR4Relay)
               .withOptionsFrom (webNoiseRelay)
-      },
-      webGain1SliderAttachment {
-          *processorRef.getState().getParameter (id::gain1.getParamID()),
-          webGain1Relay,
-          nullptr
-      },
-      webGain2SliderAttachment {
-          *processorRef.getState().getParameter (id::gain2.getParamID()),
-          webGain2Relay,
-          nullptr
-      },
-      webGain3SliderAttachment {
-          *processorRef.getState().getParameter (id::gain3.getParamID()),
-          webGain3Relay,
-          nullptr
-      },
-      webGain4SliderAttachment {
-          *processorRef.getState().getParameter (id::gain4.getParamID()),
-          webGain4Relay,
-          nullptr
       },
       webRatio1SliderAttachment {
           *processorRef.getState().getParameter (id::ratio1.getParamID()),
@@ -207,6 +196,11 @@ PluginEditor::PluginEditor (PluginProcessor& p)
       webRatio4SliderAttachment {
           *processorRef.getState().getParameter (id::ratio4.getParamID()),
           webRatio4Relay,
+          nullptr
+      },
+      webGain1Attachment {
+          *processorRef.getState().getParameter (id::h1_gain.getParamID()),
+          webGain1Relay,
           nullptr
       },
       webA1Attachment {
@@ -229,6 +223,11 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webR1Relay,
           nullptr
       },
+      webGain2Attachment {
+          *processorRef.getState().getParameter (id::h2_gain.getParamID()),
+          webGain2Relay,
+          nullptr
+      },
       webA2Attachment {
           *processorRef.getState().getParameter (id::h2_attack.getParamID()),
           webA2Relay,
@@ -249,9 +248,9 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webR2Relay,
           nullptr
       },
-      webNoiseSliderAttachment {
-          *processorRef.getState().getParameter (id::noise.getParamID()),
-          webNoiseRelay,
+      webGain3Attachment {
+          *processorRef.getState().getParameter (id::h3_gain.getParamID()),
+          webGain3Relay,
           nullptr
       },
       webA3Attachment {
@@ -272,6 +271,36 @@ PluginEditor::PluginEditor (PluginProcessor& p)
       webR3Attachment {
           *processorRef.getState().getParameter (id::h3_release.getParamID()),
           webR3Relay,
+          nullptr
+      },
+      webGain4Attachment {
+          *processorRef.getState().getParameter (id::h4_gain.getParamID()),
+          webGain4Relay,
+          nullptr
+      },
+      webA4Attachment {
+          *processorRef.getState().getParameter (id::h4_attack.getParamID()),
+          webA4Relay,
+          nullptr
+      },
+      webD4Attachment {
+          *processorRef.getState().getParameter (id::h4_decay.getParamID()),
+          webD4Relay,
+          nullptr
+      },
+      webS4Attachment {
+          *processorRef.getState().getParameter (id::h4_sustain.getParamID()),
+          webS4Relay,
+          nullptr
+      },
+      webR4Attachment {
+          *processorRef.getState().getParameter (id::h4_release.getParamID()),
+          webR4Relay,
+          nullptr
+      },
+      webNoiseSliderAttachment {
+          *processorRef.getState().getParameter (id::noise.getParamID()),
+          webNoiseRelay,
           nullptr
       }
 {

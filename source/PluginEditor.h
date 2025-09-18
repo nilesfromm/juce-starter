@@ -30,57 +30,67 @@ private:
     PluginProcessor& processorRef;
     std::unique_ptr<melatonin::Inspector> inspector;
 
-    juce::WebSliderRelay webGain1Relay;
-    juce::WebSliderRelay webGain2Relay;
-    juce::WebSliderRelay webGain3Relay;
-    juce::WebSliderRelay webGain4Relay;
     juce::WebSliderRelay webRatio1Relay;
     juce::WebSliderRelay webRatio2Relay;
     juce::WebSliderRelay webRatio3Relay;
     juce::WebSliderRelay webRatio4Relay;
 
+    juce::WebSliderRelay webGain1Relay;
     juce::WebSliderRelay webA1Relay;
     juce::WebSliderRelay webD1Relay;
     juce::WebSliderRelay webS1Relay;
     juce::WebSliderRelay webR1Relay;
 
+    juce::WebSliderRelay webGain2Relay;
     juce::WebSliderRelay webA2Relay;
     juce::WebSliderRelay webD2Relay;
     juce::WebSliderRelay webS2Relay;
     juce::WebSliderRelay webR2Relay;
 
+    juce::WebSliderRelay webGain3Relay;
     juce::WebSliderRelay webA3Relay;
     juce::WebSliderRelay webD3Relay;
     juce::WebSliderRelay webS3Relay;
     juce::WebSliderRelay webR3Relay;
 
+    juce::WebSliderRelay webGain4Relay;
+    juce::WebSliderRelay webA4Relay;
+    juce::WebSliderRelay webD4Relay;
+    juce::WebSliderRelay webS4Relay;
+    juce::WebSliderRelay webR4Relay;
+
     juce::WebSliderRelay webNoiseRelay;
 
     juce::WebBrowserComponent webView;
 
-    juce::WebSliderParameterAttachment webGain1SliderAttachment;
-    juce::WebSliderParameterAttachment webGain2SliderAttachment;
-    juce::WebSliderParameterAttachment webGain3SliderAttachment;
-    juce::WebSliderParameterAttachment webGain4SliderAttachment;
     juce::WebSliderParameterAttachment webRatio1SliderAttachment;
     juce::WebSliderParameterAttachment webRatio2SliderAttachment;
     juce::WebSliderParameterAttachment webRatio3SliderAttachment;
     juce::WebSliderParameterAttachment webRatio4SliderAttachment;
 
+    juce::WebSliderParameterAttachment webGain1Attachment;
     juce::WebSliderParameterAttachment webA1Attachment;
     juce::WebSliderParameterAttachment webD1Attachment;
     juce::WebSliderParameterAttachment webS1Attachment;
     juce::WebSliderParameterAttachment webR1Attachment;
 
+    juce::WebSliderParameterAttachment webGain2Attachment;
     juce::WebSliderParameterAttachment webA2Attachment;
     juce::WebSliderParameterAttachment webD2Attachment;
     juce::WebSliderParameterAttachment webS2Attachment;
     juce::WebSliderParameterAttachment webR2Attachment;
 
+    juce::WebSliderParameterAttachment webGain3Attachment;
     juce::WebSliderParameterAttachment webA3Attachment;
     juce::WebSliderParameterAttachment webD3Attachment;
     juce::WebSliderParameterAttachment webS3Attachment;
     juce::WebSliderParameterAttachment webR3Attachment;
+
+    juce::WebSliderParameterAttachment webGain4Attachment;
+    juce::WebSliderParameterAttachment webA4Attachment;
+    juce::WebSliderParameterAttachment webD4Attachment;
+    juce::WebSliderParameterAttachment webS4Attachment;
+    juce::WebSliderParameterAttachment webR4Attachment;
 
     juce::WebSliderParameterAttachment webNoiseSliderAttachment;
 

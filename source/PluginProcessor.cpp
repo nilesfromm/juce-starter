@@ -82,10 +82,10 @@ void PluginProcessor::setCurrentProgram (int index)
     currentPreset = index;
 
     juce::RangedAudioParameter* params[NUM_PARAMETERS] = {
-        parameters.gain1Param,
-        parameters.gain2Param,
-        parameters.gain3Param,
-        parameters.gain4Param,
+        parameters.h1_gainParam,
+        parameters.h2_gainParam,
+        parameters.h3_gainParam,
+        parameters.h4_gainParam,
         parameters.ratio1Param,
         parameters.ratio2Param,
         parameters.ratio3Param,
@@ -221,6 +221,16 @@ void PluginProcessor::updateParameters()
     float noiseMix = parameters.noiseParam->get();
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;
+
+    float h1_gain = parameters.h1_gainParam->get();
+    float h2_gain = parameters.h2_gainParam->get();
+    float h3_gain = parameters.h3_gainParam->get();
+    float h4_gain = parameters.h4_gainParam->get();
+
+    synth.h1_gain = h1_gain;
+    synth.h2_gain = h2_gain;
+    synth.h3_gain = h3_gain;
+    synth.h4_gain = h4_gain;
 }
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
