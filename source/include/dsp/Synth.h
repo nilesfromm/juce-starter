@@ -21,29 +21,18 @@ public:
 
     float volumeTrim;
 
-    float h1_gain;
-    float h1_attack;
-    float h1_decay;
-    float h1_sustain;
-    float h1_release;
-
-    float h2_gain;
-    float h2_attack;
-    float h2_decay;
-    float h2_sustain;
-    float h2_release;
-
-    float h3_gain;
-    float h3_attack;
-    float h3_decay;
-    float h3_sustain;
-    float h3_release;
-
-    float h4_gain;
-    float h4_attack;
-    float h4_decay;
-    float h4_sustain;
-    float h4_release;
+    static constexpr int NUM_HARMONICS = 4;
+    
+    struct HarmonicParams
+    {
+        float gain;
+        float attack;
+        float decay;
+        float sustain;
+        float release;
+    };
+    
+    std::array<HarmonicParams, NUM_HARMONICS> harmonics;
 
 private:
     float sampleRate;

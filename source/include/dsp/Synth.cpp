@@ -41,7 +41,7 @@ void Synth::render (float** outputBuffers, int sampleCount)
             Voice& voice = voices[v];
             if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive() || voice.env4.isActive())
             {
-                float output = voice.render (noise, h1_gain, h2_gain, h3_gain, h4_gain);
+                float output = voice.render (noise, harmonics[0].gain, harmonics[1].gain, harmonics[2].gain, harmonics[3].gain);
                 outputLeft += output;
                 outputRight += output;
             }
@@ -102,45 +102,30 @@ void Synth::startVoice (int v, int note, int velocity)
 
     Voice& voice = voices[v];
     voice.note = note;
+    float harmonicRatios[3] = { 1.0f, 2.0f, 4.0f };
     voice.h1.amp = (velocity / 127.0f) * 0.5f;
-    voice.h1.inc = baseFreq / sampleRate;
+    voice.h1.inc = baseFreq * harmonicRatios[0] / sampleRate;
     voice.h1.reset();
 
     voice.h2.amp = (velocity / 127.0f) * 0.5f;
-    voice.h2.inc = baseFreq * 2.0f / sampleRate;
+    voice.h2.inc = baseFreq * harmonicRatios[1] / sampleRate;
     voice.h2.reset();
 
     voice.h3.amp = (velocity / 127.0f) * 0.5f;
-    voice.h3.inc = baseFreq * 4.0f / sampleRate;
+    voice.h3.inc = baseFreq * harmonicRatios[2] / sampleRate;
     voice.h3.reset();
 
-    Envelope& env1 = voice.env1;
-    env1.attackMultiplier = h1_attack;
-    env1.decayMultiplier = h1_decay;
-    env1.sustainLevel = h1_sustain;
-    env1.releaseMultiplier = h1_release;
-    env1.attack();
+    Envelope* envelopes[NUM_HARMONICS] = { &voice.env1, &voice.env2, &voice.env3, &voice.env4 };
 
-    Envelope& env2 = voice.env2;
-    env2.attackMultiplier = h2_attack;
-    env2.decayMultiplier = h2_decay;
-    env2.sustainLevel = h2_sustain;
-    env2.releaseMultiplier = h2_release;
-    env2.attack();
-
-    Envelope& env3 = voice.env3;
-    env3.attackMultiplier = h3_attack;
-    env3.decayMultiplier = h3_decay;
-    env3.sustainLevel = h3_sustain;
-    env3.releaseMultiplier = h3_release;
-    env3.attack();
-
-    Envelope& env4 = voice.env4;
-    env4.attackMultiplier = h4_attack;
-    env4.decayMultiplier = h4_decay;
-    env4.sustainLevel = h4_sustain;
-    env4.releaseMultiplier = h4_release;
-    env4.attack();
+    for (int h = 0; h < NUM_HARMONICS; ++h)
+    {
+        Envelope& env = *envelopes[h];
+        env.attackMultiplier = harmonics[h].attack;
+        env.decayMultiplier = harmonics[h].decay;
+        env.sustainLevel = harmonics[h].sustain;
+        env.releaseMultiplier = harmonics[h].release;
+        env.attack();
+    }
 }
 
 void Synth::noteOff (int note)

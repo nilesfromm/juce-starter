@@ -82,10 +82,10 @@ void PluginProcessor::setCurrentProgram (int index)
     currentPreset = index;
 
     juce::RangedAudioParameter* params[NUM_PARAMETERS] = {
-        parameters.h1_gainParam,
-        parameters.h2_gainParam,
-        parameters.h3_gainParam,
-        parameters.h4_gainParam,
+        parameters.harmonicParams[0].gainParam,
+        parameters.harmonicParams[1].gainParam,
+        parameters.harmonicParams[2].gainParam,
+        parameters.harmonicParams[3].gainParam,
         parameters.ratio1Param,
         parameters.ratio2Param,
         parameters.ratio3Param,
@@ -169,85 +169,31 @@ void PluginProcessor::updateParameters()
     float sampleRate = float (getSampleRate());
     float inverseSampleRate = 1.0f / sampleRate;
 
-    synth.h1_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h1_attackParam->get()));
-
-    synth.h1_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h1_decayParam->get()));
-
-    synth.h1_sustain = parameters.h1_sustainParam->get() / 100.0f;
-
-    float envRelease1 = parameters.h1_releaseParam->get();
-    if (envRelease1 < 1.0f)
+    for (int h = 0; h < Parameters::NUM_HARMONICS; ++h)
     {
-        synth.h1_release = 0.75f;
-    }
-    else
-    {
-        synth.h1_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease1));
-    }
+        synth.harmonics[h].attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].attackParam->get()));
+        synth.harmonics[h].decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].decayParam->get()));
+        synth.harmonics[h].sustain = parameters.harmonicParams[h].sustainParam->get() / 100.0f;
 
-    synth.h2_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h2_attackParam->get()));
-
-    synth.h2_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h2_decayParam->get()));
-
-    synth.h2_sustain = parameters.h2_sustainParam->get() / 100.0f;
-
-    float envRelease2 = parameters.h2_releaseParam->get();
-    if (envRelease2 < 1.0f)
-    {
-        synth.h2_release = 0.75f;
-    }
-    else
-    {
-        synth.h2_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease2));
-    }
-
-    synth.h3_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h3_attackParam->get()));
-
-    synth.h3_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h3_decayParam->get()));
-
-    synth.h3_sustain = parameters.h3_sustainParam->get() / 100.0f;
-
-    float envRelease3 = parameters.h3_releaseParam->get();
-
-    if (envRelease3 < 1.0f)
-    {
-        synth.h3_release = 0.75f;
-    }
-    else
-    {
-        synth.h3_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease3));
-    }
-
-    synth.h4_attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h4_attackParam->get()));
-
-    synth.h4_decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.h4_decayParam->get()));
-
-    synth.h4_sustain = parameters.h4_sustainParam->get() / 100.0f;
-
-    float envRelease4 = parameters.h4_releaseParam->get();
-
-    if (envRelease4 < 1.0f)
-    {
-        synth.h4_release = 0.75f;
-    }
-    else
-    {
-        synth.h4_release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease4));
+        float envRelease = parameters.harmonicParams[h].releaseParam->get();
+        if (envRelease < 1.0f)
+        {
+            synth.harmonics[h].release = 0.75f;
+        }
+        else
+        {
+            synth.harmonics[h].release = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * envRelease));
+        }
     }
 
     float noiseMix = parameters.noiseParam->get();
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;
 
-    float h1_gain = parameters.h1_gainParam->get();
-    float h2_gain = parameters.h2_gainParam->get();
-    float h3_gain = parameters.h3_gainParam->get();
-    float h4_gain = parameters.h4_gainParam->get();
-
-    synth.h1_gain = h1_gain;
-    synth.h2_gain = h2_gain;
-    synth.h3_gain = h3_gain;
-    synth.h4_gain = h4_gain;
+    for (int h = 0; h < Parameters::NUM_HARMONICS; ++h)
+    {
+        synth.harmonics[h].gain = parameters.harmonicParams[h].gainParam->get();
+    }
 }
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,

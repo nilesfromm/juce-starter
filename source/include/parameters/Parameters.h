@@ -55,29 +55,18 @@ public:
     float ratio3 = 0.0f;
     float ratio4 = 0.0f;
 
-    float h1_gain = 0.0f;
-    float h1_attack = 0.0f;
-    float h1_decay = 0.0f;
-    float h1_sustain = 0.0f;
-    float h1_release = 0.0f;
+    static constexpr int NUM_HARMONICS = 4;
 
-    float h2_gain = 0.0f;
-    float h2_attack = 0.0f;
-    float h2_decay = 0.0f;
-    float h2_sustain = 0.0f;
-    float h2_release = 0.0f;
+    struct HarmonicParams
+    {
+        float gain = 0.0f;
+        float attack = 0.0f;
+        float decay = 0.0f;
+        float sustain = 0.0f;
+        float release = 0.0f;
+    };
 
-    float h3_gain = 0.0f;
-    float h3_attack = 0.0f;
-    float h3_decay = 0.0f;
-    float h3_sustain = 0.0f;
-    float h3_release = 0.0f;
-
-    float h4_gain = 0.0f;
-    float h4_attack = 0.0f;
-    float h4_decay = 0.0f;
-    float h4_sustain = 0.0f;
-    float h4_release = 0.0f;
+    std::array<HarmonicParams, NUM_HARMONICS> harmonics;
 
     float noise = 0.0f;
 
@@ -86,29 +75,16 @@ public:
     juce::AudioParameterFloat* ratio3Param;
     juce::AudioParameterFloat* ratio4Param;
 
-    juce::AudioParameterFloat* h1_gainParam;
-    juce::AudioParameterFloat* h1_attackParam;
-    juce::AudioParameterFloat* h1_decayParam;
-    juce::AudioParameterFloat* h1_sustainParam;
-    juce::AudioParameterFloat* h1_releaseParam;
+    struct HarmonicParamPointers
+    {
+        juce::AudioParameterFloat* gainParam;
+        juce::AudioParameterFloat* attackParam;
+        juce::AudioParameterFloat* decayParam;
+        juce::AudioParameterFloat* sustainParam;
+        juce::AudioParameterFloat* releaseParam;
+    };
 
-    juce::AudioParameterFloat* h2_gainParam;
-    juce::AudioParameterFloat* h2_attackParam;
-    juce::AudioParameterFloat* h2_decayParam;
-    juce::AudioParameterFloat* h2_sustainParam;
-    juce::AudioParameterFloat* h2_releaseParam;
-
-    juce::AudioParameterFloat* h3_gainParam;
-    juce::AudioParameterFloat* h3_attackParam;
-    juce::AudioParameterFloat* h3_decayParam;
-    juce::AudioParameterFloat* h3_sustainParam;
-    juce::AudioParameterFloat* h3_releaseParam;
-
-    juce::AudioParameterFloat* h4_gainParam;
-    juce::AudioParameterFloat* h4_attackParam;
-    juce::AudioParameterFloat* h4_decayParam;
-    juce::AudioParameterFloat* h4_sustainParam;
-    juce::AudioParameterFloat* h4_releaseParam;
+    std::array<HarmonicParamPointers, NUM_HARMONICS> harmonicParams;
 
     juce::AudioParameterFloat* noiseParam;
 
