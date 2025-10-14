@@ -317,6 +317,11 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // This can be used for hot reloading
     webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
 
+#ifndef JUCE_DEBUG
+    // Disable right-click context menu in production builds
+    webView.evaluateJavascript ("document.addEventListener('contextmenu', event => event.preventDefault());");
+#endif
+
     // setResizable (true, true);
     setSize (544, 256);
 
