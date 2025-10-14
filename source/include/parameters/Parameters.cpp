@@ -60,12 +60,12 @@ static void addParameter (
 
 static juce::NormalisableRange<float> createGainRange()
 {
-    return juce::NormalisableRange<float> { 0.f, 1.f, 0.01f, 0.9f };
+    return juce::NormalisableRange<float> { 0.f, 1.f, 0.01f, 1.0f };
 }
 
 static juce::NormalisableRange<float> createRatioRange()
 {
-    return juce::NormalisableRange<float> { 0.f, 10.f, 0.01f, 0.9f };
+    return juce::NormalisableRange<float> { 0.f, 10.f, 0.01f, 1.0f };
 }
 
 static juce::NormalisableRange<float> createEnvelopeRange()

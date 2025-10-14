@@ -30,6 +30,7 @@ const NumberInput = ({
 
   const handleChange = (value: number) => {
     const constrainedValue = Math.max(min, Math.min(max, value));
+    console.log("constrainedValue: ", constrainedValue);
     sliderState.setNormalisedValue(constrainedValue);
     if (onChange) {
       onChange(constrainedValue);
@@ -40,6 +41,7 @@ const NumberInput = ({
     const updateSlider = () => {
       if (sliderRef.current) {
         const updatedValue = sliderState.getNormalisedValue();
+        console.log("updatedValue: ", updatedValue);
         sliderRef.current.value = updatedValue;
         if (onChange) {
           onChange(updatedValue);
@@ -77,6 +79,7 @@ const NumberInput = ({
     currentValueRef.current = Number(
       Math.max(min, Math.min(max, currentValueRef.current + delta)).toFixed(2)
     );
+    console.log("currentValueRef.current: ", currentValueRef.current);
     handleChange(currentValueRef.current);
   };
 
@@ -91,7 +94,7 @@ const NumberInput = ({
       <input
         ref={sliderRef}
         type="number"
-        className="bg-[#D9D9D9] h-6 w-10 text-center"
+        className="bg-[#D9D9D9] h-6 w-full text-center"
         value={
           isDragging.current
             ? currentValueRef.current

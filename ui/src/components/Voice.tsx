@@ -26,10 +26,10 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
         release={release}
       />
       <div className="flex gap-1">
-        <div className="flex justify-between gap-1">
+        {/* <div className="flex justify-between gap-1">
           <Toggle value={isRatioLocked} onChange={setIsRatioLocked} />
-        </div>
-        <div className="grid grid-cols-3 gap-1">
+        </div> */}
+        <div className="grid grid-cols-3 gap-1 w-full">
           {isRatioLocked ? (
             <NumberInput
               key={`${voiceId}-ratio`}

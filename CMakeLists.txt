@@ -133,7 +133,7 @@ include(Assets)
 include(XcodePrettify)
 
 # Folder where web UI data reside
-set(WEBVIEW_FILES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ui/public")
+set(WEBVIEW_FILES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ui/build")
 # Copy JUCE frontend library to plugin UI files
 file(COPY "${JUCE_MODULES_DIR}/juce_gui_extra/native/javascript/" DESTINATION "${WEBVIEW_FILES_SOURCE_DIR}/js/juce/")
 # Zip WebView files

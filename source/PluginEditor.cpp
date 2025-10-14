@@ -312,7 +312,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // webView.goToURL("https://juce.com");
 
     // This is necessary if we want to use a ResourceProvider
-    // webView.goToURL(juce::WebBrowserComponent::getResourceProviderRoot());
+    // webView.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
 
     // This can be used for hot reloading
     webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
