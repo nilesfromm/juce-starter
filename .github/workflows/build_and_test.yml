@@ -1,4 +1,4 @@
-name: Pamplejuce
+name: OP8
 
 on:
   workflow_dispatch: # lets you run a build from the UI
@@ -185,8 +185,6 @@ jobs:
           # pkgbuild --analyze --root "$(dirname "${{ env.STANDALONE_PATH }}")" standalone.plist
           # plutil -replace BundleIsRelocatable -bool NO standalone.plist
           # pkgbuild --identifier "${{ env.BUNDLE_ID }}.app.pkg" --version $VERSION --root "$(dirname "${{ env.STANDALONE_PATH }}")" --component-plist standalone.plist --install-location "/Applications" "packaging/${{ env.PRODUCT_NAME }}.app.pkg"
-
-
 
           cd packaging
           envsubst < distribution.xml.template > distribution.xml
