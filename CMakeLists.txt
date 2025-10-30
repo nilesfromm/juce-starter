@@ -177,9 +177,9 @@ if (BUILD_WEB_UI)
 endif()
 
 # Optional: fail fast if index.html is missing
-if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ui/build/index.html")
-  message(FATAL_ERROR "ui/build/index.html not found. Run frontend build or enable BuildWebUI target.")
-endif()
+# if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ui/build/index.html")
+#   message(FATAL_ERROR "ui/build/index.html not found. Run frontend build or enable BuildWebUI target.")
+# endif()
 
 # Pass the prefix of the zipped files (e.g., "public/") to C++
 cmake_path(GET PUBLIC_PATH FILENAME ZIPPED_FILES_PREFIX)
