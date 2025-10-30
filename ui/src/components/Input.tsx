@@ -51,7 +51,7 @@ const NumberInput = ({
     updateSlider();
     sliderState.valueChangedEvent.addListener(updateSlider);
     return sliderState.valueChangedEvent.removeListener(updateSlider);
-  }, []);
+  }, [onChange, sliderState]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     isDragging.current = true;

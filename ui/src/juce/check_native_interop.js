@@ -38,6 +38,7 @@ if (
   typeof window.inAndroidUserScriptEval === "undefined"
 ) {
   window.inAndroidUserScriptEval = true;
+  // eslint-disable-next-line no-eval
   eval(window.__JUCE__.getAndroidUserScripts());
   delete window.inAndroidUserScriptEval;
 }

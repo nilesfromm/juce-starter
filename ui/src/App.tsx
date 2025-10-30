@@ -1,34 +1,34 @@
 import "./App.css";
-import Slider from "./components/Slider";
+// import Slider from "./components/Slider";
 import Voice from "./components/Voice";
 import * as Juce from "./juce/index.js";
 
 function App() {
   console.log("JUCE frontend library successfully imported");
   console.log(Juce);
-  const nativeFunction = Juce.getNativeFunction("nativeFunction") as (
-    a: string,
-    b: number,
-    c: null
-  ) => Promise<number>;
+  // const nativeFunction = Juce.getNativeFunction("nativeFunction") as (
+  //   a: string,
+  //   b: number,
+  //   c: null
+  // ) => Promise<number>;
 
-  const windowJuce = (window as any).__JUCE__;
-  const data = windowJuce.initialisationData;
+  // const windowJuce = (window as any).__JUCE__;
+  // // const data = windowJuce.initialisationData;
 
-  let emittedCount = 0;
+  // let emittedCount = 0;
 
-  const handleNativeFunctionButtonClick = () => {
-    nativeFunction("one", 2, null).then((result) => {
-      console.log(result);
-    });
-  };
+  // const handleNativeFunctionButtonClick = () => {
+  //   nativeFunction("one", 2, null).then((result) => {
+  //     console.log(result);
+  //   });
+  // };
 
-  const handleButtonClick = () => {
-    emittedCount++;
-    windowJuce.backend.emitEvent("exampleJavaScriptEvent", {
-      emittedCount: emittedCount,
-    });
-  };
+  // const handleButtonClick = () => {
+  //   emittedCount++;
+  //   windowJuce.backend.emitEvent("exampleJavaScriptEvent", {
+  //     emittedCount: emittedCount,
+  //   });
+  // };
 
   return (
     <div className="grid grid-cols-2 gap-2 items-center justify-center bg-[#F2F2F2] text-[#333333] p-4">

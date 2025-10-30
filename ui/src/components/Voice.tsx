@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NumberInput from "./Input";
-import Toggle from "./Toggle";
+// import Toggle from "./Toggle";
 import Envelope from "./Envelope";
 
 interface VoiceProps {
@@ -14,7 +14,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
   const [sustain, setSustain] = useState(0.0);
   const [release, setRelease] = useState(0.0);
 
-  const [isRatioLocked, setIsRatioLocked] = useState(false);
+  // const [isRatioLocked, setIsRatioLocked] = useState(false);
 
   return (
     <div className="flex relative flex-col gap-1">
@@ -30,7 +30,7 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           <Toggle value={isRatioLocked} onChange={setIsRatioLocked} />
         </div> */}
         <div className="grid grid-cols-3 gap-1 w-full">
-          {isRatioLocked ? (
+          {false ? (
             <NumberInput
               key={`${voiceId}-ratio`}
               id={`${voiceId}_frequency`}

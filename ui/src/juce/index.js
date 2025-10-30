@@ -206,11 +206,11 @@ class SliderState {
 
   /** Internal. */
   handleEvent(event) {
-    if (event.eventType == BasicControl_valueChangedEventId) {
+    if (event.eventType === BasicControl_valueChangedEventId) {
       this.scaledValue = event.value;
       this.valueChangedEvent.callListeners();
     }
-    if (event.eventType == BasicControl_propertiesChangedId) {
+    if (event.eventType === BasicControl_propertiesChangedId) {
       // eslint-disable-next-line no-unused-vars
       let { eventType: _, ...rest } = event;
       this.properties = rest;
@@ -257,7 +257,7 @@ class SliderState {
   snapToLegalValue(value) {
     const interval = this.properties.interval;
 
-    if (interval == 0) return value;
+    if (interval === 0) return value;
 
     const start = this.properties.start;
     const clamp = (val, min = 0, max = 1) => Math.max(min, Math.min(max, val));
@@ -344,11 +344,11 @@ class ToggleState {
 
   /** Internal. */
   handleEvent(event) {
-    if (event.eventType == BasicControl_valueChangedEventId) {
+    if (event.eventType === BasicControl_valueChangedEventId) {
       this.value = event.value;
       this.valueChangedEvent.callListeners();
     }
-    if (event.eventType == BasicControl_propertiesChangedId) {
+    if (event.eventType === BasicControl_propertiesChangedId) {
       // eslint-disable-next-line no-unused-vars
       let { eventType: _, ...rest } = event;
       this.properties = rest;
@@ -443,11 +443,11 @@ class ComboBoxState {
 
   /** Internal. */
   handleEvent(event) {
-    if (event.eventType == BasicControl_valueChangedEventId) {
+    if (event.eventType === BasicControl_valueChangedEventId) {
       this.value = event.value;
       this.valueChangedEvent.callListeners();
     }
-    if (event.eventType == BasicControl_propertiesChangedId) {
+    if (event.eventType === BasicControl_propertiesChangedId) {
       // eslint-disable-next-line no-unused-vars
       let { eventType: _, ...rest } = event;
       this.properties = rest;
@@ -488,10 +488,10 @@ function getBackendResourceAddress(path) {
       ? window.__JUCE__.initialisationData.__juce__platform[0]
       : "";
 
-  if (platform == "windows" || platform == "android")
+  if (platform === "windows" || platform === "android")
     return "https://juce.backend/" + path;
 
-  if (platform == "macos" || platform == "ios" || platform == "linux")
+  if (platform === "macos" || platform === "ios" || platform === "linux")
     return "juce://juce.backend/" + path;
 
   console.warn(
