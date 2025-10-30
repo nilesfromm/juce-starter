@@ -136,13 +136,13 @@ jobs:
           dev-id-installer-cert: ${{ secrets.DEV_ID_INSTALLER_CERT }}
           dev-id-installer-password: ${{ secrets.DEV_ID_INSTALLER_PASSWORD }}
 
-      - name: Debug signing identities (macOS)
-        if: ${{ matrix.name == 'macOS' }}
-        run: |
-          echo "Listing available code signing identities..."
-          security find-identity -v -p codesigning || true
-          echo "Listing Developer ID certificates..."
-          security find-certificate -a -c "Developer ID" -Z || true
+      # - name: Debug signing identities (macOS)
+      #   if: ${{ matrix.name == 'macOS' }}
+      #   run: |
+      #     echo "Listing available code signing identities..."
+      #     security find-identity -v -p codesigning || true
+      #     echo "Listing Developer ID certificates..."
+      #     security find-certificate -a -c "Developer ID" -Z || true
 
       - name: Codesign (macOS)
         if: ${{ matrix.name == 'macOS' }}
