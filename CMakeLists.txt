@@ -136,6 +136,21 @@ include(XcodePrettify)
 set(WEBVIEW_FILES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ui/build")
 # Copy JUCE frontend library to plugin UI files
 file(COPY "${JUCE_MODULES_DIR}/juce_gui_extra/native/javascript/" DESTINATION "${WEBVIEW_FILES_SOURCE_DIR}/js/juce/")
+
+# Option to build the web UI automatically (requires Node/npm)
+option(BUILD_WEB_UI "Build the Web UI (npm ci && npm run build) before zipping assets" ON)
+
+# Build the web UI if enabled
+if (BUILD_WEB_UI)
+  add_custom_target(BuildWebUI
+    COMMAND npm ci --no-audit --no-fund
+    COMMAND npm run build
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ui
+    COMMENT "Building Web UI (npm ci && npm run build)..."
+    VERBATIM
+  )
+endif()
+
 # Zip WebView files
 set(WEBVIEW_FILES_ZIP_NAME "webview_files.zip")
 set(TARGET_WEBVIEW_FILES_ZIP_PATH "${CMAKE_BINARY_DIR}/${WEBVIEW_FILES_ZIP_NAME}")
@@ -155,6 +170,16 @@ add_custom_target(ZipWebViewFiles
   COMMENT "Zipping WebView files..."
   VERBATIM
 )
+
+# Ensure the zip runs after the web UI has been built (when enabled)
+if (BUILD_WEB_UI)
+  add_dependencies(ZipWebViewFiles BuildWebUI)
+endif()
+
+# Optional: fail fast if index.html is missing
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ui/build/index.html")
+  message(FATAL_ERROR "ui/build/index.html not found. Run frontend build or enable BuildWebUI target.")
+endif()
 
 # Pass the prefix of the zipped files (e.g., "public/") to C++
 cmake_path(GET PUBLIC_PATH FILENAME ZIPPED_FILES_PREFIX)
