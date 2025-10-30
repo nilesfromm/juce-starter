@@ -1,4 +1,4 @@
-name: Pamplejuce
+name: OP8
 
 on:
   workflow_dispatch: # lets you run a build from the UI
@@ -35,17 +35,17 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         include:
-          - name: Linux
-            os: ubuntu-22.04
-            pluginval-binary: ./pluginval
-            extra-flags: -G Ninja
+          # - name: Linux
+          #   os: ubuntu-22.04
+          #   pluginval-binary: ./pluginval
+          #   extra-flags: -G Ninja
           - name: macOS
             os: macos-14
             pluginval-binary: pluginval.app/Contents/MacOS/pluginval
             extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-          - name: Windows
-            os: windows-latest
-            pluginval-binary: ./pluginval.exe
+          # - name: Windows
+          #   os: windows-latest
+          #   pluginval-binary: ./pluginval.exe
 
     steps:
       # Setup MSVC toolchain and developer command prompt (Windows)
@@ -115,7 +115,8 @@ jobs:
           echo "AU_PATH=$ARTIFACTS_PATH/AU/${{ env.PRODUCT_NAME }}.component" >> $GITHUB_ENV
           echo "AUV3_PATH=$ARTIFACTS_PATH/AUv3/${{ env.PRODUCT_NAME }}.appex" >> $GITHUB_ENV
           echo "CLAP_PATH=$ARTIFACTS_PATH/CLAP/${{ env.PRODUCT_NAME }}.clap" >> $GITHUB_ENV
-          echo "STANDALONE_PATH=$ARTIFACTS_PATH/Standalone/${{ env.PRODUCT_NAME }}.app" >> $GITHUB_ENV
+          # Standalone not built currently; keep path here commented for future use
+          # echo "STANDALONE_PATH=$ARTIFACTS_PATH/Standalone/${{ env.PRODUCT_NAME }}.app" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=${{ env.PRODUCT_NAME }}-${{ env.VERSION }}-${{ matrix.name }}" >> $GITHUB_ENV
 
       - name: Pluginval
@@ -134,6 +135,14 @@ jobs:
           dev-id-installer-cert: ${{ secrets.DEV_ID_INSTALLER_CERT }}
           dev-id-installer-password: ${{ secrets.DEV_ID_INSTALLER_PASSWORD }}
 
+      - name: Debug signing identities (macOS)
+        if: ${{ matrix.name == 'macOS' }}
+        run: |
+          echo "Listing available code signing identities..."
+          security find-identity -v -p codesigning || true
+          echo "Listing Developer ID certificates..."
+          security find-certificate -a -c "Developer ID" -Z || true
+
       - name: Codesign (macOS)
         if: ${{ matrix.name == 'macOS' }}
         timeout-minutes: 5
@@ -142,7 +151,8 @@ jobs:
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION}}" -v "${{ env.VST3_PATH }}" --deep --strict --options=runtime --timestamp
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION}}" -v "${{ env.AU_PATH }}" --deep --strict --options=runtime --timestamp
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION}}" -v "${{ env.CLAP_PATH }}" --deep --strict --options=runtime --timestamp
-          codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION}}" -v "${{ env.STANDALONE_PATH }}" --deep --strict --options=runtime --timestamp
+          # Standalone not built currently; re-enable when needed
+          # codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION}}" -v "${{ env.STANDALONE_PATH }}" --deep --strict --options=runtime --timestamp
 
       - name: Add Custom Icons (macOS)
         if: ${{ matrix.name == 'macOS' }}
@@ -171,10 +181,10 @@ jobs:
           pkgbuild --identifier "${{ env.BUNDLE_ID }}.vst3.pkg" --version $VERSION --component "${{ env.VST3_PATH }}" --install-location "/Library/Audio/Plug-Ins/VST3" "packaging/${{ env.PRODUCT_NAME }}.vst3.pkg"
           pkgbuild --identifier "${{ env.BUNDLE_ID }}.clap.pkg" --version $VERSION --component "${{ env.CLAP_PATH }}" --install-location "/Library/Audio/Plug-Ins/CLAP" "packaging/${{ env.PRODUCT_NAME }}.clap.pkg"
 
-          # Standalone is special, needs a boolean to always install in /Applications
-          pkgbuild --analyze --root "$(dirname "${{ env.STANDALONE_PATH }}")" standalone.plist
-          plutil -replace BundleIsRelocatable -bool NO standalone.plist
-          pkgbuild --identifier "${{ env.BUNDLE_ID }}.app.pkg" --version $VERSION --root "$(dirname "${{ env.STANDALONE_PATH }}")" --component-plist standalone.plist --install-location "/Applications" "packaging/${{ env.PRODUCT_NAME }}.app.pkg"
+          # Standalone packaging disabled; uncomment to include app installer
+          # pkgbuild --analyze --root "$(dirname "${{ env.STANDALONE_PATH }}")" standalone.plist
+          # plutil -replace BundleIsRelocatable -bool NO standalone.plist
+          # pkgbuild --identifier "${{ env.BUNDLE_ID }}.app.pkg" --version $VERSION --root "$(dirname "${{ env.STANDALONE_PATH }}")" --component-plist standalone.plist --install-location "/Applications" "packaging/${{ env.PRODUCT_NAME }}.app.pkg"
 
           cd packaging
           envsubst < distribution.xml.template > distribution.xml
