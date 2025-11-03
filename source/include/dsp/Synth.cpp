@@ -102,17 +102,17 @@ void Synth::startVoice (int v, int note, int velocity)
 
     Voice& voice = voices[v];
     voice.note = note;
-    float harmonicRatios[3] = { 1.0f, 2.0f, 4.0f };
+
     voice.h1.amp = (velocity / 127.0f) * 0.5f;
-    voice.h1.inc = baseFreq * harmonicRatios[0] / sampleRate;
+    voice.h1.inc = baseFreq * harmonics[0].ratio / sampleRate;
     voice.h1.reset();
 
     voice.h2.amp = (velocity / 127.0f) * 0.5f;
-    voice.h2.inc = baseFreq * harmonicRatios[1] / sampleRate;
+    voice.h2.inc = baseFreq * harmonics[1].ratio / sampleRate;
     voice.h2.reset();
 
     voice.h3.amp = (velocity / 127.0f) * 0.5f;
-    voice.h3.inc = baseFreq * harmonicRatios[2] / sampleRate;
+    voice.h3.inc = baseFreq * harmonics[2].ratio / sampleRate;
     voice.h3.reset();
 
     Envelope* envelopes[NUM_HARMONICS] = { &voice.env1, &voice.env2, &voice.env3, &voice.env4 };

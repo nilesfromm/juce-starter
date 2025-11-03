@@ -14,7 +14,7 @@ void Parameters::reset() noexcept
 {
     for (int i = 0; i < NUM_HARMONICS; ++i)
     {
-        harmonics[i].ratio = 0.0f;
+        harmonics[i].ratio = 1.0f;
         harmonics[i].gain = 0.0f;
         harmonics[i].attack = 0.0f;
         harmonics[i].decay = 0.0f;
@@ -41,12 +41,12 @@ static void addParameter (
 
 static juce::NormalisableRange<float> createGainRange()
 {
-    return juce::NormalisableRange<float> { 0.f, 1.f, 0.01f, 1.0f };
+    return juce::NormalisableRange<float> { 0.f, 1.f, 0.0001f, 1.0f };
 }
 
 static juce::NormalisableRange<float> createRatioRange()
 {
-    return juce::NormalisableRange<float> { 0.f, 10.f, 0.01f, 1.0f };
+    return juce::NormalisableRange<float> { 0.f, 12.f, 0.0001f, 1.0f };
 }
 
 static juce::NormalisableRange<float> createEnvelopeRange()

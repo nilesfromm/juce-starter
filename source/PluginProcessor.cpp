@@ -171,6 +171,9 @@ void PluginProcessor::updateParameters()
 
     for (int h = 0; h < Parameters::NUM_HARMONICS; ++h)
     {
+        synth.harmonics[h].gain = parameters.harmonicParams[h].gainParam->get();
+        synth.harmonics[h].ratio = parameters.harmonicParams[h].ratioParam->get();
+
         synth.harmonics[h].attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].attackParam->get()));
         synth.harmonics[h].decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].decayParam->get()));
         synth.harmonics[h].sustain = parameters.harmonicParams[h].sustainParam->get() / 100.0f;
@@ -189,11 +192,6 @@ void PluginProcessor::updateParameters()
     float noiseMix = parameters.noiseParam->get();
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;
-
-    for (int h = 0; h < Parameters::NUM_HARMONICS; ++h)
-    {
-        synth.harmonics[h].gain = parameters.harmonicParams[h].gainParam->get();
-    }
 }
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,

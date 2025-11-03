@@ -30,13 +30,13 @@ const Voice = ({ voiceId, voiceName }: VoiceProps) => {
           <Toggle value={isRatioLocked} onChange={setIsRatioLocked} />
         </div> */}
         <div className="grid grid-cols-3 gap-1 w-full">
-          {false ? (
+          {true ? (
             <NumberInput
               key={`${voiceId}-ratio`}
-              id={`${voiceId}_frequency`}
+              id={`${voiceId}_ratio`}
               label="R"
               min={0}
-              max={1}
+              max={12}
               step={0.01}
             />
           ) : (

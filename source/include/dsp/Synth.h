@@ -22,16 +22,17 @@ public:
     float volumeTrim;
 
     static constexpr int NUM_HARMONICS = 4;
-    
+
     struct HarmonicParams
     {
         float gain;
+        float ratio;
         float attack;
         float decay;
         float sustain;
         float release;
     };
-    
+
     std::array<HarmonicParams, NUM_HARMONICS> harmonics;
 
 private:

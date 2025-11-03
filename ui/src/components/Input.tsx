@@ -26,16 +26,14 @@ const NumberInput = ({
 
   const [sliderValue, setSliderValue] = useState<number>(sliderState.getNormalisedValue());
 
-  // const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   sliderState.setNormalisedValue(event.target.value);
-  // };
-
   const handleChange = (value: number) => {
     const constrainedValue = Math.max(min, Math.min(max, value));
+    const normalisedValue = constrainedValue / max;
     console.log("constrainedValue: ", constrainedValue);
-    sliderState.setNormalisedValue(constrainedValue);
+    console.log("normalisedValue: ", normalisedValue);
+    sliderState.setNormalisedValue(normalisedValue);
     if (onChange) {
-      onChange(constrainedValue);
+      onChange(normalisedValue);
     }
   };
 
@@ -43,11 +41,12 @@ const NumberInput = ({
     const updateSlider = () => {
       if (sliderRef.current) {
         const updatedValue = sliderState.getNormalisedValue();
-        console.log("updatedValue: ", updatedValue);
-        sliderRef.current.value = updatedValue;
-        setSliderValue(updatedValue);
+        const normalisedValue = updatedValue * max;
+        const roundedValue = Math.round(normalisedValue * 10000) / 10000;
+        sliderRef.current.value = roundedValue.toString();
+        setSliderValue(roundedValue);
         if (onChange) {
-          onChange(updatedValue);
+          onChange(roundedValue);
         }
       }
     };
@@ -75,14 +74,12 @@ const NumberInput = ({
   const handleMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     if (!isDragging) return;
-    console.log("dragging: ", currentValueRef.current);
 
     const sensitivity = step;
     const delta = -e.movementY * sensitivity;
     currentValueRef.current = Number(
       Math.max(min, Math.min(max, currentValueRef.current + delta)).toFixed(2)
     );
-    console.log("currentValueRef.current: ", currentValueRef.current);
     handleChange(currentValueRef.current);
   };
 
