@@ -100,10 +100,10 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      webRatio1Relay { id::ratio1.getParamID() },
-      webRatio2Relay { id::ratio2.getParamID() },
-      webRatio3Relay { id::ratio3.getParamID() },
-      webRatio4Relay { id::ratio4.getParamID() },
+      webRatio1Relay { id::h1_ratio.getParamID() },
+      webRatio2Relay { id::h2_ratio.getParamID() },
+      webRatio3Relay { id::h3_ratio.getParamID() },
+      webRatio4Relay { id::h4_ratio.getParamID() },
 
       webGain1Relay { id::h1_gain.getParamID() },
       webA1Relay { id::h1_attack.getParamID() },
@@ -153,54 +153,43 @@ PluginEditor::PluginEditor (PluginProcessor& p)
               .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION)
 
               .withOptionsFrom (webGain1Relay)
-              .withOptionsFrom (webGain2Relay)
-              .withOptionsFrom (webGain3Relay)
-              .withOptionsFrom (webGain4Relay)
               .withOptionsFrom (webRatio1Relay)
-              .withOptionsFrom (webRatio2Relay)
-              .withOptionsFrom (webRatio3Relay)
-              .withOptionsFrom (webRatio4Relay)
               .withOptionsFrom (webA1Relay)
               .withOptionsFrom (webD1Relay)
               .withOptionsFrom (webS1Relay)
               .withOptionsFrom (webR1Relay)
+
+              .withOptionsFrom (webGain2Relay)
+              .withOptionsFrom (webRatio2Relay)
               .withOptionsFrom (webA2Relay)
               .withOptionsFrom (webD2Relay)
               .withOptionsFrom (webS2Relay)
               .withOptionsFrom (webR2Relay)
+
+              .withOptionsFrom (webGain3Relay)
+              .withOptionsFrom (webRatio3Relay)
               .withOptionsFrom (webA3Relay)
               .withOptionsFrom (webD3Relay)
               .withOptionsFrom (webS3Relay)
               .withOptionsFrom (webR3Relay)
+
+              .withOptionsFrom (webGain4Relay)
+              .withOptionsFrom (webRatio4Relay)
               .withOptionsFrom (webA4Relay)
               .withOptionsFrom (webD4Relay)
               .withOptionsFrom (webS4Relay)
               .withOptionsFrom (webR4Relay)
               .withOptionsFrom (webNoiseRelay)
       },
-      webRatio1SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio1.getParamID()),
-          webRatio1Relay,
-          nullptr
-      },
-      webRatio2SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio2.getParamID()),
-          webRatio2Relay,
-          nullptr
-      },
-      webRatio3SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio3.getParamID()),
-          webRatio3Relay,
-          nullptr
-      },
-      webRatio4SliderAttachment {
-          *processorRef.getState().getParameter (id::ratio4.getParamID()),
-          webRatio4Relay,
-          nullptr
-      },
+
       webGain1Attachment {
           *processorRef.getState().getParameter (id::h1_gain.getParamID()),
           webGain1Relay,
+          nullptr
+      },
+      webRatio1SliderAttachment {
+          *processorRef.getState().getParameter (id::h1_ratio.getParamID()),
+          webRatio1Relay,
           nullptr
       },
       webA1Attachment {
@@ -223,9 +212,15 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webR1Relay,
           nullptr
       },
+
       webGain2Attachment {
           *processorRef.getState().getParameter (id::h2_gain.getParamID()),
           webGain2Relay,
+          nullptr
+      },
+      webRatio2SliderAttachment {
+          *processorRef.getState().getParameter (id::h2_ratio.getParamID()),
+          webRatio2Relay,
           nullptr
       },
       webA2Attachment {
@@ -248,9 +243,15 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webR2Relay,
           nullptr
       },
+
       webGain3Attachment {
           *processorRef.getState().getParameter (id::h3_gain.getParamID()),
           webGain3Relay,
+          nullptr
+      },
+      webRatio3SliderAttachment {
+          *processorRef.getState().getParameter (id::h3_ratio.getParamID()),
+          webRatio3Relay,
           nullptr
       },
       webA3Attachment {
@@ -273,9 +274,15 @@ PluginEditor::PluginEditor (PluginProcessor& p)
           webR3Relay,
           nullptr
       },
+
       webGain4Attachment {
           *processorRef.getState().getParameter (id::h4_gain.getParamID()),
           webGain4Relay,
+          nullptr
+      },
+      webRatio4SliderAttachment {
+          *processorRef.getState().getParameter (id::h4_ratio.getParamID()),
+          webRatio4Relay,
           nullptr
       },
       webA4Attachment {
@@ -312,10 +319,10 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // webView.goToURL("https://juce.com");
 
     // This is necessary if we want to use a ResourceProvider
-    webView.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
+    // webView.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
 
     // This can be used for hot reloading
-    // webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
+    webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
 
 #ifndef JUCE_DEBUG
     // Disable right-click context menu in production builds

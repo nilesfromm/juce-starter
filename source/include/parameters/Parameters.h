@@ -6,29 +6,28 @@ namespace id
 {
 #define PARAMETER_ID(str) const juce::ParameterID str (#str, 1) //could be static const?
 
-    PARAMETER_ID (ratio1);
-    PARAMETER_ID (ratio2);
-    PARAMETER_ID (ratio3);
-    PARAMETER_ID (ratio4);
-
+    PARAMETER_ID (h1_ratio);
     PARAMETER_ID (h1_gain);
     PARAMETER_ID (h1_attack);
     PARAMETER_ID (h1_decay);
     PARAMETER_ID (h1_sustain);
     PARAMETER_ID (h1_release);
 
+    PARAMETER_ID (h2_ratio);
     PARAMETER_ID (h2_gain);
     PARAMETER_ID (h2_attack);
     PARAMETER_ID (h2_decay);
     PARAMETER_ID (h2_sustain);
     PARAMETER_ID (h2_release);
 
+    PARAMETER_ID (h3_ratio);
     PARAMETER_ID (h3_gain);
     PARAMETER_ID (h3_attack);
     PARAMETER_ID (h3_decay);
     PARAMETER_ID (h3_sustain);
     PARAMETER_ID (h3_release);
 
+    PARAMETER_ID (h4_ratio);
     PARAMETER_ID (h4_gain);
     PARAMETER_ID (h4_attack);
     PARAMETER_ID (h4_decay);
@@ -50,15 +49,11 @@ public:
     void prepareToPlay (double sampleRate) noexcept;
     void reset() noexcept;
 
-    float ratio1 = 0.0f;
-    float ratio2 = 0.0f;
-    float ratio3 = 0.0f;
-    float ratio4 = 0.0f;
-
     static constexpr int NUM_HARMONICS = 4;
 
     struct HarmonicParams
     {
+        float ratio = 0.0f;
         float gain = 0.0f;
         float attack = 0.0f;
         float decay = 0.0f;
@@ -70,13 +65,9 @@ public:
 
     float noise = 0.0f;
 
-    juce::AudioParameterFloat* ratio1Param;
-    juce::AudioParameterFloat* ratio2Param;
-    juce::AudioParameterFloat* ratio3Param;
-    juce::AudioParameterFloat* ratio4Param;
-
     struct HarmonicParamPointers
     {
+        juce::AudioParameterFloat* ratioParam;
         juce::AudioParameterFloat* gainParam;
         juce::AudioParameterFloat* attackParam;
         juce::AudioParameterFloat* decayParam;

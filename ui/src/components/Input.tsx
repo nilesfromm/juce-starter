@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Juce from "../juce/index.js";
 
 interface NumberInputProps {
@@ -24,6 +24,8 @@ const NumberInput = ({
   const sliderRef = useRef<HTMLInputElement>(null);
   const sliderState = Juce.getSliderState(id);
 
+  const [sliderValue, setSliderValue] = useState<number>(sliderState.getNormalisedValue());
+
   // const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   sliderState.setNormalisedValue(event.target.value);
   // };
@@ -43,6 +45,7 @@ const NumberInput = ({
         const updatedValue = sliderState.getNormalisedValue();
         console.log("updatedValue: ", updatedValue);
         sliderRef.current.value = updatedValue;
+        setSliderValue(updatedValue);
         if (onChange) {
           onChange(updatedValue);
         }
@@ -98,9 +101,15 @@ const NumberInput = ({
         value={
           isDragging.current
             ? currentValueRef.current
-            : sliderState.getNormalisedValue()
+            : sliderValue
         }
-        onChange={(e) => handleChange(Number(e.target.value))}
+        onChange={(e) => setSliderValue(Number(e.target.value))}
+        onBlur={() => handleChange(sliderValue)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleChange(sliderValue);
+          }
+        }}
       />
     </div>
   );

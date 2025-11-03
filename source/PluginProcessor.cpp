@@ -83,13 +83,13 @@ void PluginProcessor::setCurrentProgram (int index)
 
     juce::RangedAudioParameter* params[NUM_PARAMETERS] = {
         parameters.harmonicParams[0].gainParam,
+        parameters.harmonicParams[0].ratioParam,
         parameters.harmonicParams[1].gainParam,
+        parameters.harmonicParams[1].ratioParam,
         parameters.harmonicParams[2].gainParam,
+        parameters.harmonicParams[2].ratioParam,
         parameters.harmonicParams[3].gainParam,
-        parameters.ratio1Param,
-        parameters.ratio2Param,
-        parameters.ratio3Param,
-        parameters.ratio4Param,
+        parameters.harmonicParams[3].ratioParam,
         parameters.noiseParam,
     };
 
