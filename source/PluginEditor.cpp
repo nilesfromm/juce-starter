@@ -100,212 +100,167 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      webRatio1Relay { id::h1_ratio.getParamID() },
-      webRatio2Relay { id::h2_ratio.getParamID() },
-      webRatio3Relay { id::h3_ratio.getParamID() },
-      webRatio4Relay { id::h4_ratio.getParamID() },
-
-      webGain1Relay { id::h1_gain.getParamID() },
-      webA1Relay { id::h1_attack.getParamID() },
-      webD1Relay { id::h1_decay.getParamID() },
-      webS1Relay { id::h1_sustain.getParamID() },
-      webR1Relay { id::h1_release.getParamID() },
-
-      webGain2Relay { id::h2_gain.getParamID() },
-      webA2Relay { id::h2_attack.getParamID() },
-      webD2Relay { id::h2_decay.getParamID() },
-      webS2Relay { id::h2_sustain.getParamID() },
-      webR2Relay { id::h2_release.getParamID() },
-
-      webGain3Relay { id::h3_gain.getParamID() },
-      webA3Relay { id::h3_attack.getParamID() },
-      webD3Relay { id::h3_decay.getParamID() },
-      webS3Relay { id::h3_sustain.getParamID() },
-      webR3Relay { id::h3_release.getParamID() },
-
-      webGain4Relay { id::h4_gain.getParamID() },
-      webA4Relay { id::h4_attack.getParamID() },
-      webD4Relay { id::h4_decay.getParamID() },
-      webS4Relay { id::h4_sustain.getParamID() },
-      webR4Relay { id::h4_release.getParamID() },
-
+      webRatioRelays { { juce::WebSliderRelay { id::h1_ratio.getParamID() },
+          juce::WebSliderRelay { id::h2_ratio.getParamID() },
+          juce::WebSliderRelay { id::h3_ratio.getParamID() },
+          juce::WebSliderRelay { id::h4_ratio.getParamID() },
+          juce::WebSliderRelay { id::h5_ratio.getParamID() },
+          juce::WebSliderRelay { id::h6_ratio.getParamID() },
+          juce::WebSliderRelay { id::h7_ratio.getParamID() },
+          juce::WebSliderRelay { id::h8_ratio.getParamID() },
+          juce::WebSliderRelay { id::h9_ratio.getParamID() } } },
+      webGainRelays { { juce::WebSliderRelay { id::h1_gain.getParamID() },
+          juce::WebSliderRelay { id::h2_gain.getParamID() },
+          juce::WebSliderRelay { id::h3_gain.getParamID() },
+          juce::WebSliderRelay { id::h4_gain.getParamID() },
+          juce::WebSliderRelay { id::h5_gain.getParamID() },
+          juce::WebSliderRelay { id::h6_gain.getParamID() },
+          juce::WebSliderRelay { id::h7_gain.getParamID() },
+          juce::WebSliderRelay { id::h8_gain.getParamID() },
+          juce::WebSliderRelay { id::h9_gain.getParamID() } } },
+      webAttackRelays { { juce::WebSliderRelay { id::h1_attack.getParamID() },
+          juce::WebSliderRelay { id::h2_attack.getParamID() },
+          juce::WebSliderRelay { id::h3_attack.getParamID() },
+          juce::WebSliderRelay { id::h4_attack.getParamID() },
+          juce::WebSliderRelay { id::h5_attack.getParamID() },
+          juce::WebSliderRelay { id::h6_attack.getParamID() },
+          juce::WebSliderRelay { id::h7_attack.getParamID() },
+          juce::WebSliderRelay { id::h8_attack.getParamID() },
+          juce::WebSliderRelay { id::h9_attack.getParamID() } } },
+      webDecayRelays { { juce::WebSliderRelay { id::h1_decay.getParamID() },
+          juce::WebSliderRelay { id::h2_decay.getParamID() },
+          juce::WebSliderRelay { id::h3_decay.getParamID() },
+          juce::WebSliderRelay { id::h4_decay.getParamID() },
+          juce::WebSliderRelay { id::h5_decay.getParamID() },
+          juce::WebSliderRelay { id::h6_decay.getParamID() },
+          juce::WebSliderRelay { id::h7_decay.getParamID() },
+          juce::WebSliderRelay { id::h8_decay.getParamID() },
+          juce::WebSliderRelay { id::h9_decay.getParamID() } } },
+      webSustainRelays { { juce::WebSliderRelay { id::h1_sustain.getParamID() },
+          juce::WebSliderRelay { id::h2_sustain.getParamID() },
+          juce::WebSliderRelay { id::h3_sustain.getParamID() },
+          juce::WebSliderRelay { id::h4_sustain.getParamID() },
+          juce::WebSliderRelay { id::h5_sustain.getParamID() },
+          juce::WebSliderRelay { id::h6_sustain.getParamID() },
+          juce::WebSliderRelay { id::h7_sustain.getParamID() },
+          juce::WebSliderRelay { id::h8_sustain.getParamID() },
+          juce::WebSliderRelay { id::h9_sustain.getParamID() } } },
+      webReleaseRelays { { juce::WebSliderRelay { id::h1_release.getParamID() },
+          juce::WebSliderRelay { id::h2_release.getParamID() },
+          juce::WebSliderRelay { id::h3_release.getParamID() },
+          juce::WebSliderRelay { id::h4_release.getParamID() },
+          juce::WebSliderRelay { id::h5_release.getParamID() },
+          juce::WebSliderRelay { id::h6_release.getParamID() },
+          juce::WebSliderRelay { id::h7_release.getParamID() },
+          juce::WebSliderRelay { id::h8_release.getParamID() },
+          juce::WebSliderRelay { id::h9_release.getParamID() } } },
       webNoiseRelay { id::noise.getParamID() },
 
       webView {
-          juce::WebBrowserComponent::Options {}
-              .withBackend (
-                  juce::WebBrowserComponent::Options::Backend::webview2)
-              .withWinWebView2Options (
-                  juce::WebBrowserComponent::Options::WinWebView2 {}
-                      .withBackgroundColour (juce::Colours::white)
-                      // this may be necessary for some DAWs; include for safety
-                      .withUserDataFolder (juce::File::getSpecialLocation (
-                          juce::File::SpecialLocationType::tempDirectory)))
-              .withNativeIntegrationEnabled()
-              .withResourceProvider (
-                  [this] (const auto& url) { return getResource (url); },
-                  // allowedOriginIn parameter is necessary to
-                  // retrieve resources from the C++ backend even if
-                  // on live server
-                  juce::URL { LOCAL_DEV_SERVER_ADDRESS }.getOrigin())
-              .withInitialisationData ("vendor", JUCE_COMPANY_NAME)
-              .withInitialisationData ("pluginName", JUCE_PRODUCT_NAME)
-              .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION)
+          [&] {
+              auto options = juce::WebBrowserComponent::Options {}
+                                 .withBackend (
+                                     juce::WebBrowserComponent::Options::Backend::webview2)
+                                 .withWinWebView2Options (
+                                     juce::WebBrowserComponent::Options::WinWebView2 {}
+                                         .withBackgroundColour (juce::Colours::white)
+                                         // this may be necessary for some DAWs; include for safety
+                                         .withUserDataFolder (juce::File::getSpecialLocation (
+                                             juce::File::SpecialLocationType::tempDirectory)))
+                                 .withNativeIntegrationEnabled()
+                                 .withResourceProvider (
+                                     [this] (const auto& url) { return getResource (url); },
+                                     // allowedOriginIn parameter is necessary to
+                                     // retrieve resources from the C++ backend even if
+                                     // on live server
+                                     juce::URL { LOCAL_DEV_SERVER_ADDRESS }.getOrigin())
+                                 .withInitialisationData ("vendor", JUCE_COMPANY_NAME)
+                                 .withInitialisationData ("pluginName", JUCE_PRODUCT_NAME)
+                                 .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION);
 
-              .withOptionsFrom (webGain1Relay)
-              .withOptionsFrom (webRatio1Relay)
-              .withOptionsFrom (webA1Relay)
-              .withOptionsFrom (webD1Relay)
-              .withOptionsFrom (webS1Relay)
-              .withOptionsFrom (webR1Relay)
+              // Add all harmonic parameter relays
+              for (int i = 0; i < NUM_HARMONICS; ++i)
+              {
+                  options = options
+                                .withOptionsFrom (webGainRelays[i])
+                                .withOptionsFrom (webRatioRelays[i])
+                                .withOptionsFrom (webAttackRelays[i])
+                                .withOptionsFrom (webDecayRelays[i])
+                                .withOptionsFrom (webSustainRelays[i])
+                                .withOptionsFrom (webReleaseRelays[i]);
+              }
 
-              .withOptionsFrom (webGain2Relay)
-              .withOptionsFrom (webRatio2Relay)
-              .withOptionsFrom (webA2Relay)
-              .withOptionsFrom (webD2Relay)
-              .withOptionsFrom (webS2Relay)
-              .withOptionsFrom (webR2Relay)
-
-              .withOptionsFrom (webGain3Relay)
-              .withOptionsFrom (webRatio3Relay)
-              .withOptionsFrom (webA3Relay)
-              .withOptionsFrom (webD3Relay)
-              .withOptionsFrom (webS3Relay)
-              .withOptionsFrom (webR3Relay)
-
-              .withOptionsFrom (webGain4Relay)
-              .withOptionsFrom (webRatio4Relay)
-              .withOptionsFrom (webA4Relay)
-              .withOptionsFrom (webD4Relay)
-              .withOptionsFrom (webS4Relay)
-              .withOptionsFrom (webR4Relay)
-              .withOptionsFrom (webNoiseRelay)
+              return options.withOptionsFrom (webNoiseRelay);
+          }()
       },
 
-      webGain1Attachment {
-          *processorRef.getState().getParameter (id::h1_gain.getParamID()),
-          webGain1Relay,
-          nullptr
+      webGainAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_gain.getParamID()), webGainRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_gain.getParamID()), webGainRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_gain.getParamID()), webGainRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_gain.getParamID()), webGainRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_gain.getParamID()), webGainRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_gain.getParamID()), webGainRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_gain.getParamID()), webGainRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_gain.getParamID()), webGainRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_gain.getParamID()), webGainRelays[8], nullptr } }
       },
-      webRatio1SliderAttachment {
-          *processorRef.getState().getParameter (id::h1_ratio.getParamID()),
-          webRatio1Relay,
-          nullptr
+      webRatioAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_ratio.getParamID()), webRatioRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_ratio.getParamID()), webRatioRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_ratio.getParamID()), webRatioRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_ratio.getParamID()), webRatioRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_ratio.getParamID()), webRatioRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_ratio.getParamID()), webRatioRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_ratio.getParamID()), webRatioRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_ratio.getParamID()), webRatioRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_ratio.getParamID()), webRatioRelays[8], nullptr } }
       },
-      webA1Attachment {
-          *processorRef.getState().getParameter (id::h1_attack.getParamID()),
-          webA1Relay,
-          nullptr
+      webAttackAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_attack.getParamID()), webAttackRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_attack.getParamID()), webAttackRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_attack.getParamID()), webAttackRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_attack.getParamID()), webAttackRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_attack.getParamID()), webAttackRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_attack.getParamID()), webAttackRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_attack.getParamID()), webAttackRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_attack.getParamID()), webAttackRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_attack.getParamID()), webAttackRelays[8], nullptr } }
       },
-      webD1Attachment {
-          *processorRef.getState().getParameter (id::h1_decay.getParamID()),
-          webD1Relay,
-          nullptr
+      webDecayAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_decay.getParamID()), webDecayRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_decay.getParamID()), webDecayRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_decay.getParamID()), webDecayRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_decay.getParamID()), webDecayRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_decay.getParamID()), webDecayRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_decay.getParamID()), webDecayRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_decay.getParamID()), webDecayRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_decay.getParamID()), webDecayRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_decay.getParamID()), webDecayRelays[8], nullptr } }
       },
-      webS1Attachment {
-          *processorRef.getState().getParameter (id::h1_sustain.getParamID()),
-          webS1Relay,
-          nullptr
+      webSustainAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_sustain.getParamID()), webSustainRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_sustain.getParamID()), webSustainRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_sustain.getParamID()), webSustainRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_sustain.getParamID()), webSustainRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_sustain.getParamID()), webSustainRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_sustain.getParamID()), webSustainRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_sustain.getParamID()), webSustainRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_sustain.getParamID()), webSustainRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_sustain.getParamID()), webSustainRelays[8], nullptr } }
       },
-      webR1Attachment {
-          *processorRef.getState().getParameter (id::h1_release.getParamID()),
-          webR1Relay,
-          nullptr
+      webReleaseAttachments {
+          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_release.getParamID()), webReleaseRelays[0], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_release.getParamID()), webReleaseRelays[1], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_release.getParamID()), webReleaseRelays[2], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_release.getParamID()), webReleaseRelays[3], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_release.getParamID()), webReleaseRelays[4], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_release.getParamID()), webReleaseRelays[5], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_release.getParamID()), webReleaseRelays[6], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_release.getParamID()), webReleaseRelays[7], nullptr },
+              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_release.getParamID()), webReleaseRelays[8], nullptr } }
       },
-
-      webGain2Attachment {
-          *processorRef.getState().getParameter (id::h2_gain.getParamID()),
-          webGain2Relay,
-          nullptr
-      },
-      webRatio2SliderAttachment {
-          *processorRef.getState().getParameter (id::h2_ratio.getParamID()),
-          webRatio2Relay,
-          nullptr
-      },
-      webA2Attachment {
-          *processorRef.getState().getParameter (id::h2_attack.getParamID()),
-          webA2Relay,
-          nullptr
-      },
-      webD2Attachment {
-          *processorRef.getState().getParameter (id::h2_decay.getParamID()),
-          webD2Relay,
-          nullptr
-      },
-      webS2Attachment {
-          *processorRef.getState().getParameter (id::h2_sustain.getParamID()),
-          webS2Relay,
-          nullptr
-      },
-      webR2Attachment {
-          *processorRef.getState().getParameter (id::h2_release.getParamID()),
-          webR2Relay,
-          nullptr
-      },
-
-      webGain3Attachment {
-          *processorRef.getState().getParameter (id::h3_gain.getParamID()),
-          webGain3Relay,
-          nullptr
-      },
-      webRatio3SliderAttachment {
-          *processorRef.getState().getParameter (id::h3_ratio.getParamID()),
-          webRatio3Relay,
-          nullptr
-      },
-      webA3Attachment {
-          *processorRef.getState().getParameter (id::h3_attack.getParamID()),
-          webA3Relay,
-          nullptr
-      },
-      webD3Attachment {
-          *processorRef.getState().getParameter (id::h3_decay.getParamID()),
-          webD3Relay,
-          nullptr
-      },
-      webS3Attachment {
-          *processorRef.getState().getParameter (id::h3_sustain.getParamID()),
-          webS3Relay,
-          nullptr
-      },
-      webR3Attachment {
-          *processorRef.getState().getParameter (id::h3_release.getParamID()),
-          webR3Relay,
-          nullptr
-      },
-
-      webGain4Attachment {
-          *processorRef.getState().getParameter (id::h4_gain.getParamID()),
-          webGain4Relay,
-          nullptr
-      },
-      webRatio4SliderAttachment {
-          *processorRef.getState().getParameter (id::h4_ratio.getParamID()),
-          webRatio4Relay,
-          nullptr
-      },
-      webA4Attachment {
-          *processorRef.getState().getParameter (id::h4_attack.getParamID()),
-          webA4Relay,
-          nullptr
-      },
-      webD4Attachment {
-          *processorRef.getState().getParameter (id::h4_decay.getParamID()),
-          webD4Relay,
-          nullptr
-      },
-      webS4Attachment {
-          *processorRef.getState().getParameter (id::h4_sustain.getParamID()),
-          webS4Relay,
-          nullptr
-      },
-      webR4Attachment {
-          *processorRef.getState().getParameter (id::h4_release.getParamID()),
-          webR4Relay,
-          nullptr
-      },
-      webNoiseSliderAttachment {
+      webNoiseAttachment {
           *processorRef.getState().getParameter (id::noise.getParamID()),
           webNoiseRelay,
           nullptr
@@ -330,7 +285,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 #endif
 
     // setResizable (true, true);
-    setSize (544, 256);
+    setSize (784, 530);
 
     startTimer (60);
 }

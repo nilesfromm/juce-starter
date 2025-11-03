@@ -34,6 +34,41 @@ namespace id
     PARAMETER_ID (h4_sustain);
     PARAMETER_ID (h4_release);
 
+    PARAMETER_ID (h5_ratio);
+    PARAMETER_ID (h5_gain);
+    PARAMETER_ID (h5_attack);
+    PARAMETER_ID (h5_decay);
+    PARAMETER_ID (h5_sustain);
+    PARAMETER_ID (h5_release);
+
+    PARAMETER_ID (h6_ratio);
+    PARAMETER_ID (h6_gain);
+    PARAMETER_ID (h6_attack);
+    PARAMETER_ID (h6_decay);
+    PARAMETER_ID (h6_sustain);
+    PARAMETER_ID (h6_release);
+
+    PARAMETER_ID (h7_ratio);
+    PARAMETER_ID (h7_gain);
+    PARAMETER_ID (h7_attack);
+    PARAMETER_ID (h7_decay);
+    PARAMETER_ID (h7_sustain);
+    PARAMETER_ID (h7_release);
+
+    PARAMETER_ID (h8_ratio);
+    PARAMETER_ID (h8_gain);
+    PARAMETER_ID (h8_attack);
+    PARAMETER_ID (h8_decay);
+    PARAMETER_ID (h8_sustain);
+    PARAMETER_ID (h8_release);
+
+    PARAMETER_ID (h9_ratio);
+    PARAMETER_ID (h9_gain);
+    PARAMETER_ID (h9_attack);
+    PARAMETER_ID (h9_decay);
+    PARAMETER_ID (h9_sustain);
+    PARAMETER_ID (h9_release);
+
     PARAMETER_ID (noise);
 
 #undef PARAMETER_ID
@@ -49,7 +84,7 @@ public:
     void prepareToPlay (double sampleRate) noexcept;
     void reset() noexcept;
 
-    static constexpr int NUM_HARMONICS = 4;
+    static constexpr int NUM_HARMONICS = 9;
 
     struct HarmonicParams
     {

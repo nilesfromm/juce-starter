@@ -39,9 +39,9 @@ void Synth::render (float** outputBuffers, int sampleCount)
         for (int v = 0; v < MAX_VOICES; v++)
         {
             Voice& voice = voices[v];
-            if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive() || voice.env4.isActive())
+            if (voice.env1.isActive() || voice.env2.isActive() || voice.env3.isActive() || voice.env4.isActive() || voice.env4.isActive() || voice.env6.isActive() || voice.env7.isActive() || voice.env8.isActive() || voice.env9.isActive())
             {
-                float output = voice.render (noise, harmonics[0].gain, harmonics[1].gain, harmonics[2].gain, harmonics[3].gain);
+                float output = voice.render (noise, harmonics[0].gain, harmonics[1].gain, harmonics[2].gain, harmonics[3].gain, harmonics[4].gain, harmonics[5].gain, harmonics[6].gain, harmonics[7].gain, harmonics[8].gain);
                 outputLeft += output;
                 outputRight += output;
             }
@@ -55,12 +55,17 @@ void Synth::render (float** outputBuffers, int sampleCount)
     for (int v = 0; v < MAX_VOICES; v++)
     {
         Voice& voice = voices[v];
-        if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive() && !voice.env4.isActive())
+        if (!voice.env1.isActive() && !voice.env2.isActive() && !voice.env3.isActive() && !voice.env4.isActive() && !voice.env5.isActive() && !voice.env6.isActive() && !voice.env7.isActive() && !voice.env8.isActive() && !voice.env9.isActive())
         {
             voice.env1.reset();
             voice.env2.reset();
             voice.env3.reset();
             voice.env4.reset();
+            voice.env5.reset();
+            voice.env6.reset();
+            voice.env7.reset();
+            voice.env8.reset();
+            voice.env9.reset();
         }
     }
 
@@ -115,7 +120,27 @@ void Synth::startVoice (int v, int note, int velocity)
     voice.h3.inc = baseFreq * harmonics[2].ratio / sampleRate;
     voice.h3.reset();
 
-    Envelope* envelopes[NUM_HARMONICS] = { &voice.env1, &voice.env2, &voice.env3, &voice.env4 };
+    voice.h4.amp = (velocity / 127.0f) * 0.5f;
+    voice.h4.inc = baseFreq * harmonics[3].ratio / sampleRate;
+    voice.h4.reset();
+
+    voice.h5.amp = (velocity / 127.0f) * 0.5f;
+    voice.h5.inc = baseFreq * harmonics[4].ratio / sampleRate;
+    voice.h5.reset();
+
+    voice.h6.amp = (velocity / 127.0f) * 0.5f;
+    voice.h6.inc = baseFreq * harmonics[5].ratio / sampleRate;
+    voice.h6.reset();
+
+    voice.h7.amp = (velocity / 127.0f) * 0.5f;
+    voice.h7.inc = baseFreq * harmonics[6].ratio / sampleRate;
+    voice.h7.reset();
+
+    voice.h8.amp = (velocity / 127.0f) * 0.5f;
+    voice.h8.inc = baseFreq * harmonics[7].ratio / sampleRate;
+    voice.h8.reset();
+
+    Envelope* envelopes[NUM_HARMONICS] = { &voice.env1, &voice.env2, &voice.env3, &voice.env4, &voice.env5, &voice.env6, &voice.env7, &voice.env8, &voice.env9 };
 
     for (int h = 0; h < NUM_HARMONICS; ++h)
     {
@@ -138,6 +163,11 @@ void Synth::noteOff (int note)
             voices[v].env2.release();
             voices[v].env3.release();
             voices[v].env4.release();
+            voices[v].env5.release();
+            voices[v].env6.release();
+            voices[v].env7.release();
+            voices[v].env8.release();
+            voices[v].env9.release();
             voices[v].note = 0;
         }
     }

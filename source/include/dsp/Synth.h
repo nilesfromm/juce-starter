@@ -21,7 +21,7 @@ public:
 
     float volumeTrim;
 
-    static constexpr int NUM_HARMONICS = 4;
+    static constexpr int NUM_HARMONICS = 9;
 
     struct HarmonicParams
     {
