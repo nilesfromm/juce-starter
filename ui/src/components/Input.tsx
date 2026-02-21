@@ -24,7 +24,9 @@ const NumberInput = ({
   const sliderRef = useRef<HTMLInputElement>(null);
   const sliderState = Juce.getSliderState(id);
 
-  const [sliderValue, setSliderValue] = useState<number>(sliderState.getNormalisedValue());
+  const [sliderValue, setSliderValue] = useState<number>(
+    sliderState.getNormalisedValue()
+  );
 
   const handleChange = (value: number) => {
     const constrainedValue = Math.max(min, Math.min(max, value));
@@ -95,11 +97,7 @@ const NumberInput = ({
         ref={sliderRef}
         type="number"
         className="bg-[#D9D9D9] h-6 w-full text-center"
-        value={
-          isDragging.current
-            ? currentValueRef.current
-            : sliderValue
-        }
+        value={isDragging.current ? currentValueRef.current : sliderValue}
         onChange={(e) => setSliderValue(Number(e.target.value))}
         onBlur={() => handleChange(sliderValue)}
         onKeyDown={(e) => {

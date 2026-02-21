@@ -140,8 +140,8 @@ file(COPY "${JUCE_MODULES_DIR}/juce_gui_extra/native/javascript/" DESTINATION "$
 # Option to build the web UI automatically (requires Node/npm)
 option(BUILD_WEB_UI "Build the Web UI (npm ci && npm run build) before zipping assets" ON)
 
-# Build the web UI if enabled
-if (BUILD_WEB_UI)
+# Build the web UI if enabled and in Release mode
+if (BUILD_WEB_UI AND CMAKE_BUILD_TYPE STREQUAL "Release")
   add_custom_target(BuildWebUI
     COMMAND npm ci --no-audit --no-fund
     COMMAND npm run build
@@ -171,8 +171,8 @@ add_custom_target(ZipWebViewFiles
   VERBATIM
 )
 
-# Ensure the zip runs after the web UI has been built (when enabled)
-if (BUILD_WEB_UI)
+# Ensure the zip runs after the web UI has been built (when enabled and in Release mode)
+if (BUILD_WEB_UI AND CMAKE_BUILD_TYPE STREQUAL "Release")
   add_dependencies(ZipWebViewFiles BuildWebUI)
 endif()
 
