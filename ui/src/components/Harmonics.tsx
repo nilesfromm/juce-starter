@@ -152,16 +152,24 @@ const HARMONIC_IDS = ["h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8"];
 
 const Harmonics = () => {
   const harmonicsWrapperRef = useRef<HTMLDivElement>(null);
+  const [wrapperBounds, setWrapperBounds] = useState<DOMRect | undefined>();
+
+  useEffect(() => {
+    const wrapperRef = harmonicsWrapperRef.current;
+    if (!wrapperRef) return;
+
+    const observer = new ResizeObserver(() => {
+      setWrapperBounds(wrapperRef.getBoundingClientRect());
+    });
+    observer.observe(wrapperRef);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="w-[752px] h-[124px] bg-black/10 p-6">
+    <div className="w-full h-[124px] bg-black/10 p-6">
       <div ref={harmonicsWrapperRef} className="relative w-full h-full">
         {HARMONIC_IDS.map((id) => (
-          <Harmonic
-            key={id}
-            id={id}
-            harmonicsWrapperBounds={harmonicsWrapperRef.current?.getBoundingClientRect()}
-          />
+          <Harmonic key={id} id={id} harmonicsWrapperBounds={wrapperBounds} />
         ))}
       </div>
     </div>

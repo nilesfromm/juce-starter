@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import Harmonics from './components/Harmonics';
-import Voice from './components/Voice';
-import './store/bridge';
-import { useParamStore } from './store/paramStore';
+import { useEffect, useState } from "react";
+import "./App.css";
+import Harmonics from "./components/Harmonics";
+import Voice from "./components/Voice";
+import "./store/bridge";
+import { useParamStore } from "./store/paramStore";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -28,7 +28,12 @@ function App() {
         <Voice voiceId="h8" voiceName="H8" />
         <Voice voiceId="h9" voiceName="N1" />
       </div>
-      <Harmonics />
+      <div className="grid grid-cols-3 gap-4 items-center justify-center text-[#333333]">
+        <div className="col-span-2">
+          <Harmonics />
+        </div>
+        <div className="col-span-1 bg-blue-600 w-full h-[124px]"></div>
+      </div>
     </div>
   );
 }
