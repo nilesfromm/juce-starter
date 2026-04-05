@@ -1,57 +1,27 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import * as Juce from "../juce/index.js";
+import { useParamStore } from "../store/paramStore";
 
 interface HarmonicProps {
   id: string;
-  ratio: number;
-  gain: number;
   harmonicsWrapperBounds: DOMRect | undefined;
-  onGainChange: (id: string, newGain: number) => void;
-  onRatioChange: (id: string, newRatio: number) => void;
 }
 
-const Harmonic = ({
-  id,
-  ratio,
-  gain,
-  harmonicsWrapperBounds,
-  onGainChange,
-  onRatioChange,
-}: HarmonicProps) => {
+const Harmonic = ({ id, harmonicsWrapperBounds }: HarmonicProps) => {
   const minHarmonic = 0;
-  const maxHarmonic = 12;
+  const maxHarmonic = 16;
 
-  const [isDragging, setIsDragging] = useState<0 | 1 | 2>(0); // 0: not dragging, 1: dragging gain(y), 2: dragging ratio(x)
+  const gain = useParamStore((s) => s.values[`${id}_gain`] ?? 0);
+  const ratio = useParamStore((s) => s.values[`${id}_ratio`] ?? 0);
+  const setParam = useParamStore((s) => s.setParam);
+
+  const [isDragging, setIsDragging] = useState<0 | 1 | 2>(0);
   const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
   const { width: wrapperWidth, left: wrapperLeft } = harmonicsWrapperBounds || {
     width: 0,
-    height: 0,
     left: 0,
   };
-
-  const gainSliderState = Juce.getSliderState(`${id}_gain`);
-  const ratioSliderState = Juce.getSliderState(`${id}_ratio`);
-
-  useEffect(() => {
-    const updateGainSlider = () => {
-      const updatedValue = gainSliderState.getNormalisedValue();
-      const normalisedValue = updatedValue;
-      const roundedValue = Math.round(normalisedValue * 10000) / 10000;
-      onGainChange(id, roundedValue);
-    };
-    const updateRatioSlider = () => {
-      const updatedValue = ratioSliderState.getNormalisedValue();
-      const normalisedValue = updatedValue;
-      const roundedValue = Math.round(normalisedValue * 10000) / 10000;
-      onRatioChange(id, roundedValue * (maxHarmonic - minHarmonic));
-    };
-    updateGainSlider();
-    updateRatioSlider();
-    gainSliderState.valueChangedEvent.addListener(updateGainSlider);
-    ratioSliderState.valueChangedEvent.addListener(updateRatioSlider);
-  }, [id, onGainChange, gainSliderState, ratioSliderState, onRatioChange]);
 
   const calculateGainFromY = useCallback(
     (clientY: number) => {
@@ -59,80 +29,69 @@ const Harmonic = ({
       const rect = containerRef.current.getBoundingClientRect();
       const relativeY = clientY - rect.top;
       const height = rect.height;
-      // Clamp between 0 and 1, inverted (top = 1, bottom = 0)
-      const newGain = Math.max(0, Math.min(1, 1 - relativeY / height));
-      return newGain;
+      return Math.max(0, Math.min(1, 1 - relativeY / height));
     },
-    [gain]
+    [gain],
   );
 
   const calculateRatioFromX = useCallback(
     (clientX: number) => {
       if (!containerRef.current) return ratio;
       const relativeX = clientX - wrapperLeft;
-      const newRatio = Math.max(
-        0,
-        Math.min(maxHarmonic, relativeX / (wrapperWidth / maxHarmonic))
+      return Math.max(
+        minHarmonic,
+        Math.min(
+          maxHarmonic,
+          minHarmonic +
+            relativeX / (wrapperWidth / (maxHarmonic - minHarmonic)),
+        ),
       );
-      return newRatio;
     },
-    [ratio, wrapperWidth, wrapperLeft]
+    [ratio, wrapperWidth, wrapperLeft],
   );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
-
       if (e.shiftKey) {
         setIsDragging(2);
       } else {
         setIsDragging(1);
         const newGain = calculateGainFromY(e.clientY);
-        onGainChange(id, newGain);
-        gainSliderState.setNormalisedValue(newGain);
+        setParam(`${id}_gain`, newGain);
       }
     },
-    [id, onGainChange, calculateGainFromY, gainSliderState]
+    [id, calculateGainFromY, setParam],
   );
 
   useEffect(() => {
-    let hoverCount = 0;
+    // TODO: take this logic out if not needed?
+    // let hoverCount = 0;
     const container = containerRef.current;
     const span = spanRef.current;
 
-    const handleContainerEnter = () => {
-      hoverCount++;
+    const handleEnter = () => {
+      // hoverCount++;
       setIsHovering(true);
     };
-    const handleContainerLeave = () => {
-      hoverCount--;
-      if (hoverCount <= 0) {
-        hoverCount = 0;
-        setIsHovering(false);
-      }
-    };
-    const handleSpanEnter = () => {
-      hoverCount++;
-      setIsHovering(true);
-    };
-    const handleSpanLeave = () => {
-      hoverCount--;
-      if (hoverCount <= 0) {
-        hoverCount = 0;
-        setIsHovering(false);
-      }
+    const handleLeave = () => {
+      // hoverCount--;
+      // if (hoverCount <= 0) {
+      //   hoverCount = 0;
+      setIsHovering(false);
+      // }
     };
 
-    container?.addEventListener("mouseenter", handleContainerEnter);
-    container?.addEventListener("mouseleave", handleContainerLeave);
-    span?.addEventListener("mouseenter", handleSpanEnter);
-    span?.addEventListener("mouseleave", handleSpanLeave);
+    container?.addEventListener("mouseenter", handleEnter);
+    container?.addEventListener("mouseleave", handleLeave);
+    span?.addEventListener("mouseenter", handleEnter);
+    span?.addEventListener("mouseleave", handleLeave);
 
     return () => {
-      container?.removeEventListener("mouseenter", handleContainerEnter);
-      container?.removeEventListener("mouseleave", handleContainerLeave);
-      span?.removeEventListener("mouseenter", handleSpanEnter);
-      span?.removeEventListener("mouseleave", handleSpanLeave);
+      container?.removeEventListener("mouseenter", handleEnter);
+      container?.removeEventListener("mouseleave", handleLeave);
+      span?.removeEventListener("mouseenter", handleEnter);
+      span?.removeEventListener("mouseleave", handleLeave);
     };
   }, []);
 
@@ -141,42 +100,25 @@ const Harmonic = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging === 1) {
-        const newGain = calculateGainFromY(e.clientY);
-        onGainChange(id, newGain);
-        gainSliderState.setNormalisedValue(newGain);
+        setParam(`${id}_gain`, calculateGainFromY(e.clientY));
       } else if (isDragging === 2) {
         const newRatio = calculateRatioFromX(e.clientX);
         const updatedRatio = !e.shiftKey
           ? Math.round(newRatio * 100) / 100
           : Math.round(newRatio);
-        onRatioChange(id, updatedRatio);
-        ratioSliderState.setNormalisedValue(
-          updatedRatio / (maxHarmonic - minHarmonic)
-        );
+        setParam(`${id}_ratio`, updatedRatio);
       }
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(0);
-    };
+    const handleMouseUp = () => setIsDragging(0);
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [
-    isDragging,
-    id,
-    onGainChange,
-    calculateGainFromY,
-    onRatioChange,
-    calculateRatioFromX,
-    gainSliderState,
-    ratioSliderState,
-  ]);
+  }, [isDragging, id, calculateGainFromY, calculateRatioFromX, setParam]);
 
   const showRatioLabel = isHovering || isDragging !== 0;
 
@@ -185,17 +127,14 @@ const Harmonic = ({
       ref={containerRef}
       className="absolute w-[8px] h-full flex items-end justify-center translate-x-[-4px]"
       style={{
-        left: `${(ratio / maxHarmonic) * 100}%`,
+        left: `${((ratio - minHarmonic) / (maxHarmonic - minHarmonic)) * 100}%`,
       }}
       onMouseDown={handleMouseDown}
     >
       <div className="size-full bg-black/10 m-0.5 flex items-end">
         <div
           className="w-full bg-black/70 transition-opacity"
-          style={{
-            height: `${gain * 100}%`,
-            opacity: isDragging ? 0.8 : 1,
-          }}
+          style={{ height: `${gain * 100}%`, opacity: isDragging ? 0.8 : 1 }}
         />
       </div>
       <span
@@ -209,79 +148,19 @@ const Harmonic = ({
   );
 };
 
+const HARMONIC_IDS = ["h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8"];
+
 const Harmonics = () => {
   const harmonicsWrapperRef = useRef<HTMLDivElement>(null);
-  const [harmonics, setHarmonics] = useState([
-    {
-      id: "h1",
-      ratio: 1,
-      gain: 0.5,
-    },
-    {
-      id: "h2",
-      ratio: 2,
-      gain: 0.5,
-    },
-    {
-      id: "h3",
-      ratio: 3,
-      gain: 0.5,
-    },
-    {
-      id: "h4",
-      ratio: 4,
-      gain: 0.5,
-    },
-    {
-      id: "h5",
-      ratio: 5,
-      gain: 0.5,
-    },
-    {
-      id: "h6",
-      ratio: 6,
-      gain: 0.5,
-    },
-    {
-      id: "h7",
-      ratio: 7,
-      gain: 0.5,
-    },
-    {
-      id: "h8",
-      ratio: 8,
-      gain: 0.5,
-    },
-  ]);
-
-  const handleGainChange = useCallback((id: string, newGain: number) => {
-    setHarmonics((prev) =>
-      prev.map((harmonic) =>
-        harmonic.id === id ? { ...harmonic, gain: newGain } : harmonic
-      )
-    );
-  }, []);
-
-  const handleRatioChange = useCallback((id: string, newRatio: number) => {
-    setHarmonics((prev) =>
-      prev.map((harmonic) =>
-        harmonic.id === id ? { ...harmonic, ratio: newRatio } : harmonic
-      )
-    );
-  }, []);
 
   return (
     <div className="w-[752px] h-[124px] bg-black/10 p-6">
       <div ref={harmonicsWrapperRef} className="relative w-full h-full">
-        {harmonics.map((harmonic) => (
+        {HARMONIC_IDS.map((id) => (
           <Harmonic
-            key={harmonic.id}
-            id={harmonic.id}
-            ratio={harmonic.ratio}
-            gain={harmonic.gain}
+            key={id}
+            id={id}
             harmonicsWrapperBounds={harmonicsWrapperRef.current?.getBoundingClientRect()}
-            onGainChange={handleGainChange}
-            onRatioChange={handleRatioChange}
           />
         ))}
       </div>

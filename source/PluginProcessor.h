@@ -73,7 +73,7 @@ private:
         *this,
         nullptr,
         "Parameters",
-        Parameters::createParameterLayout (parameters)
+        Parameters::createParameterLayout()
     };
     Parameters parameters;
     void createPresets();

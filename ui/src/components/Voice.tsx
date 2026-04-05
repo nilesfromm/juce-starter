@@ -1,7 +1,7 @@
-import { useState } from "react";
-import NumberInput from "./Input";
-// import Toggle from "./Toggle";
-import Envelope from "./Envelope";
+import { useShallow } from 'zustand/react/shallow';
+import NumberInput from './Input';
+import Envelope from './Envelope';
+import { useParamStore } from '../store/paramStore';
 
 interface VoiceProps {
   voiceId: string;
@@ -9,91 +9,27 @@ interface VoiceProps {
 }
 
 const Voice = ({ voiceId, voiceName }: VoiceProps) => {
-  const [attack, setAttack] = useState(0.0);
-  const [decay, setDecay] = useState(0.0);
-  const [sustain, setSustain] = useState(0.0);
-  const [release, setRelease] = useState(0.0);
-
-  // const [isRatioLocked, setIsRatioLocked] = useState(false);
+  const { attack, decay, sustain, release } = useParamStore(
+    useShallow((s) => ({
+      attack: s.values[`${voiceId}_attack`] ?? 0,
+      decay: s.values[`${voiceId}_decay`] ?? 0,
+      sustain: s.values[`${voiceId}_sustain`] ?? 0,
+      release: s.values[`${voiceId}_release`] ?? 0,
+    }))
+  );
 
   return (
     <div className="flex relative flex-col gap-1">
       <h1 className="absolute top-0 left-1 text-[12px]">{voiceName}</h1>
-      <Envelope
-        attack={attack}
-        decay={decay}
-        sustain={sustain}
-        release={release}
-      />
+      <Envelope attack={attack} decay={decay} sustain={sustain} release={release} />
       <div className="flex gap-1">
-        {/* <div className="flex justify-between gap-1">
-          <Toggle value={isRatioLocked} onChange={setIsRatioLocked} />
-        </div> */}
         <div className="grid grid-cols-3 gap-1 w-full">
-          {true ? (
-            <NumberInput
-              key={`${voiceId}-ratio`}
-              id={`${voiceId}_ratio`}
-              label="R"
-              min={0}
-              max={12}
-              step={0.01}
-            />
-          ) : (
-            <NumberInput
-              key={`${voiceId}-frequency`}
-              id={`${voiceId}_frequency`}
-              label="F"
-              min={0}
-              max={1}
-              step={0.01}
-            />
-          )}
-
-          <NumberInput
-            key={`${voiceId}-attack`}
-            id={`${voiceId}_attack`}
-            label="A"
-            onChange={setAttack}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <NumberInput
-            key={`${voiceId}-sustain`}
-            id={`${voiceId}_sustain`}
-            label="S"
-            onChange={setSustain}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <NumberInput
-            key={`${voiceId}-gain`}
-            id={`${voiceId}_gain`}
-            label="G"
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <NumberInput
-            key={`${voiceId}-decay`}
-            id={`${voiceId}_decay`}
-            label="D"
-            onChange={setDecay}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-          <NumberInput
-            key={`${voiceId}-release`}
-            id={`${voiceId}_release`}
-            label="R"
-            onChange={setRelease}
-            min={0}
-            max={1}
-            step={0.01}
-          />
+          <NumberInput id={`${voiceId}_ratio`} label="R" min={0} max={12} step={0.01} />
+          <NumberInput id={`${voiceId}_attack`} label="A" min={0} max={100} step={1} />
+          <NumberInput id={`${voiceId}_sustain`} label="S" min={0} max={100} step={1} />
+          <NumberInput id={`${voiceId}_gain`} label="G" min={0} max={1} step={0.01} />
+          <NumberInput id={`${voiceId}_decay`} label="D" min={0} max={100} step={1} />
+          <NumberInput id={`${voiceId}_release`} label="R" min={0} max={100} step={1} />
         </div>
       </div>
     </div>

@@ -6,13 +6,13 @@ interface EnvelopeProps {
 }
 
 const Envelope = ({ attack, decay, sustain, release }: EnvelopeProps) => {
-  const p1x = attack * 40;
+  const p1x = (attack * 40) / 100;
   const p1y = 100;
-  const p2x = (attack + decay) * 40;
-  const p2y = sustain * 100;
+  const p2x = ((attack + decay) * 40) / 100;
+  const p2y = (sustain * 100) / 100;
   const p3x = 80;
-  const p3y = sustain * 100;
-  const p4x = 80 + release * 40;
+  const p3y = (sustain * 100) / 100;
+  const p4x = 80 + (release * 40) / 100;
   const p4y = 0;
 
   return (

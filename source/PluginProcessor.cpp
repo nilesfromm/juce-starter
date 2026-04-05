@@ -82,15 +82,15 @@ void PluginProcessor::setCurrentProgram (int index)
     currentPreset = index;
 
     juce::RangedAudioParameter* params[NUM_PARAMETERS] = {
-        parameters.harmonicParams[0].gainParam,
-        parameters.harmonicParams[0].ratioParam,
-        parameters.harmonicParams[1].gainParam,
-        parameters.harmonicParams[1].ratioParam,
-        parameters.harmonicParams[2].gainParam,
-        parameters.harmonicParams[2].ratioParam,
-        parameters.harmonicParams[3].gainParam,
-        parameters.harmonicParams[3].ratioParam,
-        parameters.noiseParam,
+        parameters.getParam ("h1_gain"),
+        parameters.getParam ("h1_ratio"),
+        parameters.getParam ("h2_gain"),
+        parameters.getParam ("h2_ratio"),
+        parameters.getParam ("h3_gain"),
+        parameters.getParam ("h3_ratio"),
+        parameters.getParam ("h4_gain"),
+        parameters.getParam ("h4_ratio"),
+        parameters.getParam ("noise"),
     };
 
     const Preset& preset = presets[index];
@@ -169,16 +169,18 @@ void PluginProcessor::updateParameters()
     float sampleRate = float (getSampleRate());
     float inverseSampleRate = 1.0f / sampleRate;
 
-    for (int h = 0; h < Parameters::NUM_HARMONICS; ++h)
+    for (int h = 0; h < Synth::NUM_HARMONICS; ++h)
     {
-        synth.harmonics[h].gain = parameters.harmonicParams[h].gainParam->get();
-        synth.harmonics[h].ratio = parameters.harmonicParams[h].ratioParam->get();
+        auto prefix = std::string ("h") + std::to_string (h + 1) + "_";
 
-        synth.harmonics[h].attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].attackParam->get()));
-        synth.harmonics[h].decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.harmonicParams[h].decayParam->get()));
-        synth.harmonics[h].sustain = parameters.harmonicParams[h].sustainParam->get() / 100.0f;
+        synth.harmonics[h].gain = parameters.getParam ((prefix + "gain").c_str())->get();
+        synth.harmonics[h].ratio = parameters.getParam ((prefix + "ratio").c_str())->get();
 
-        float envRelease = parameters.harmonicParams[h].releaseParam->get();
+        synth.harmonics[h].attack = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.getParam ((prefix + "attack").c_str())->get()));
+        synth.harmonics[h].decay = std::exp (-inverseSampleRate * std::exp (5.5f - 0.075f * parameters.getParam ((prefix + "decay").c_str())->get()));
+        synth.harmonics[h].sustain = parameters.getParam ((prefix + "sustain").c_str())->get() / 100.0f;
+
+        float envRelease = parameters.getParam ((prefix + "release").c_str())->get();
         if (envRelease < 1.0f)
         {
             synth.harmonics[h].release = 0.75f;
@@ -189,7 +191,7 @@ void PluginProcessor::updateParameters()
         }
     }
 
-    float noiseMix = parameters.noiseParam->get();
+    float noiseMix = parameters.getParam ("noise")->get();
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;
 }

@@ -1,15 +1,8 @@
 #include "PluginEditor.h"
-
 #include "PluginProcessor.h"
-#include "include/parameters/Parameters.h"
-#include "juce_core/juce_core.h"
-#include "juce_graphics/juce_graphics.h"
-#include "juce_gui_extra/juce_gui_extra.h"
+#include "parameters/ParameterSchema.h"
 #include <WebViewFiles.h>
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_events/juce_events.h>
 #include <optional>
-#include <ranges>
 
 namespace
 {
@@ -51,24 +44,11 @@ namespace
         return "";
     }
 
-    juce::Identifier getExampleEventId()
-    {
-        static const juce::Identifier id { "exampleEvent" };
-        return id;
-    }
-
 #ifndef ZIPPED_FILES_PREFIX
     #error \
         "You must provide the prefix of zipped web UI files' paths, e.g., 'public/', in the ZIPPED_FILES_PREFIX compile definition"
 #endif
 
-    /**
- * @brief Get a web UI file as bytes
- *
- * @param filepath path of the form "index.html", "js/index.js", etc.
- * @return std::vector<std::byte> with bytes of a read file or an empty vector
- * if the file is not contained in webview_files.zip
- */
     std::vector<std::byte> getWebViewFileAsBytes (const juce::String& filepath)
     {
         juce::MemoryInputStream zipStream { webview_files::webview_files_zip,
@@ -100,204 +80,69 @@ namespace
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p),
       processorRef (p),
-      webRatioRelays { { juce::WebSliderRelay { id::h1_ratio.getParamID() },
-          juce::WebSliderRelay { id::h2_ratio.getParamID() },
-          juce::WebSliderRelay { id::h3_ratio.getParamID() },
-          juce::WebSliderRelay { id::h4_ratio.getParamID() },
-          juce::WebSliderRelay { id::h5_ratio.getParamID() },
-          juce::WebSliderRelay { id::h6_ratio.getParamID() },
-          juce::WebSliderRelay { id::h7_ratio.getParamID() },
-          juce::WebSliderRelay { id::h8_ratio.getParamID() },
-          juce::WebSliderRelay { id::h9_ratio.getParamID() } } },
-      webGainRelays { { juce::WebSliderRelay { id::h1_gain.getParamID() },
-          juce::WebSliderRelay { id::h2_gain.getParamID() },
-          juce::WebSliderRelay { id::h3_gain.getParamID() },
-          juce::WebSliderRelay { id::h4_gain.getParamID() },
-          juce::WebSliderRelay { id::h5_gain.getParamID() },
-          juce::WebSliderRelay { id::h6_gain.getParamID() },
-          juce::WebSliderRelay { id::h7_gain.getParamID() },
-          juce::WebSliderRelay { id::h8_gain.getParamID() },
-          juce::WebSliderRelay { id::h9_gain.getParamID() } } },
-      webAttackRelays { { juce::WebSliderRelay { id::h1_attack.getParamID() },
-          juce::WebSliderRelay { id::h2_attack.getParamID() },
-          juce::WebSliderRelay { id::h3_attack.getParamID() },
-          juce::WebSliderRelay { id::h4_attack.getParamID() },
-          juce::WebSliderRelay { id::h5_attack.getParamID() },
-          juce::WebSliderRelay { id::h6_attack.getParamID() },
-          juce::WebSliderRelay { id::h7_attack.getParamID() },
-          juce::WebSliderRelay { id::h8_attack.getParamID() },
-          juce::WebSliderRelay { id::h9_attack.getParamID() } } },
-      webDecayRelays { { juce::WebSliderRelay { id::h1_decay.getParamID() },
-          juce::WebSliderRelay { id::h2_decay.getParamID() },
-          juce::WebSliderRelay { id::h3_decay.getParamID() },
-          juce::WebSliderRelay { id::h4_decay.getParamID() },
-          juce::WebSliderRelay { id::h5_decay.getParamID() },
-          juce::WebSliderRelay { id::h6_decay.getParamID() },
-          juce::WebSliderRelay { id::h7_decay.getParamID() },
-          juce::WebSliderRelay { id::h8_decay.getParamID() },
-          juce::WebSliderRelay { id::h9_decay.getParamID() } } },
-      webSustainRelays { { juce::WebSliderRelay { id::h1_sustain.getParamID() },
-          juce::WebSliderRelay { id::h2_sustain.getParamID() },
-          juce::WebSliderRelay { id::h3_sustain.getParamID() },
-          juce::WebSliderRelay { id::h4_sustain.getParamID() },
-          juce::WebSliderRelay { id::h5_sustain.getParamID() },
-          juce::WebSliderRelay { id::h6_sustain.getParamID() },
-          juce::WebSliderRelay { id::h7_sustain.getParamID() },
-          juce::WebSliderRelay { id::h8_sustain.getParamID() },
-          juce::WebSliderRelay { id::h9_sustain.getParamID() } } },
-      webReleaseRelays { { juce::WebSliderRelay { id::h1_release.getParamID() },
-          juce::WebSliderRelay { id::h2_release.getParamID() },
-          juce::WebSliderRelay { id::h3_release.getParamID() },
-          juce::WebSliderRelay { id::h4_release.getParamID() },
-          juce::WebSliderRelay { id::h5_release.getParamID() },
-          juce::WebSliderRelay { id::h6_release.getParamID() },
-          juce::WebSliderRelay { id::h7_release.getParamID() },
-          juce::WebSliderRelay { id::h8_release.getParamID() },
-          juce::WebSliderRelay { id::h9_release.getParamID() } } },
-      webNoiseRelay { id::noise.getParamID() },
-
       webView {
-          [&] {
-              auto options = juce::WebBrowserComponent::Options {}
-                                 .withBackend (
-                                     juce::WebBrowserComponent::Options::Backend::webview2)
-                                 .withWinWebView2Options (
-                                     juce::WebBrowserComponent::Options::WinWebView2 {}
-                                         .withBackgroundColour (juce::Colours::white)
-                                         // this may be necessary for some DAWs; include for safety
-                                         .withUserDataFolder (juce::File::getSpecialLocation (
-                                             juce::File::SpecialLocationType::tempDirectory)))
-                                 .withNativeIntegrationEnabled()
-                                 .withResourceProvider (
-                                     [this] (const auto& url) { return getResource (url); },
-                                     // allowedOriginIn parameter is necessary to
-                                     // retrieve resources from the C++ backend even if
-                                     // on live server
-                                     juce::URL { LOCAL_DEV_SERVER_ADDRESS }.getOrigin())
-                                 .withInitialisationData ("vendor", JUCE_COMPANY_NAME)
-                                 .withInitialisationData ("pluginName", JUCE_PRODUCT_NAME)
-                                 .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION);
-
-              // Add all harmonic parameter relays
-              for (int i = 0; i < NUM_HARMONICS; ++i)
-              {
-                  options = options
-                                .withOptionsFrom (webGainRelays[i])
-                                .withOptionsFrom (webRatioRelays[i])
-                                .withOptionsFrom (webAttackRelays[i])
-                                .withOptionsFrom (webDecayRelays[i])
-                                .withOptionsFrom (webSustainRelays[i])
-                                .withOptionsFrom (webReleaseRelays[i]);
-              }
-
-              return options.withOptionsFrom (webNoiseRelay);
-          }()
-      },
-
-      webGainAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_gain.getParamID()), webGainRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_gain.getParamID()), webGainRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_gain.getParamID()), webGainRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_gain.getParamID()), webGainRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_gain.getParamID()), webGainRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_gain.getParamID()), webGainRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_gain.getParamID()), webGainRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_gain.getParamID()), webGainRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_gain.getParamID()), webGainRelays[8], nullptr } }
-      },
-      webRatioAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_ratio.getParamID()), webRatioRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_ratio.getParamID()), webRatioRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_ratio.getParamID()), webRatioRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_ratio.getParamID()), webRatioRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_ratio.getParamID()), webRatioRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_ratio.getParamID()), webRatioRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_ratio.getParamID()), webRatioRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_ratio.getParamID()), webRatioRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_ratio.getParamID()), webRatioRelays[8], nullptr } }
-      },
-      webAttackAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_attack.getParamID()), webAttackRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_attack.getParamID()), webAttackRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_attack.getParamID()), webAttackRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_attack.getParamID()), webAttackRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_attack.getParamID()), webAttackRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_attack.getParamID()), webAttackRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_attack.getParamID()), webAttackRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_attack.getParamID()), webAttackRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_attack.getParamID()), webAttackRelays[8], nullptr } }
-      },
-      webDecayAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_decay.getParamID()), webDecayRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_decay.getParamID()), webDecayRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_decay.getParamID()), webDecayRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_decay.getParamID()), webDecayRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_decay.getParamID()), webDecayRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_decay.getParamID()), webDecayRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_decay.getParamID()), webDecayRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_decay.getParamID()), webDecayRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_decay.getParamID()), webDecayRelays[8], nullptr } }
-      },
-      webSustainAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_sustain.getParamID()), webSustainRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_sustain.getParamID()), webSustainRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_sustain.getParamID()), webSustainRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_sustain.getParamID()), webSustainRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_sustain.getParamID()), webSustainRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_sustain.getParamID()), webSustainRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_sustain.getParamID()), webSustainRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_sustain.getParamID()), webSustainRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_sustain.getParamID()), webSustainRelays[8], nullptr } }
-      },
-      webReleaseAttachments {
-          { juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h1_release.getParamID()), webReleaseRelays[0], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h2_release.getParamID()), webReleaseRelays[1], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h3_release.getParamID()), webReleaseRelays[2], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h4_release.getParamID()), webReleaseRelays[3], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h5_release.getParamID()), webReleaseRelays[4], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h6_release.getParamID()), webReleaseRelays[5], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h7_release.getParamID()), webReleaseRelays[6], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h8_release.getParamID()), webReleaseRelays[7], nullptr },
-              juce::WebSliderParameterAttachment { *processorRef.getState().getParameter (id::h9_release.getParamID()), webReleaseRelays[8], nullptr } }
-      },
-      webNoiseAttachment {
-          *processorRef.getState().getParameter (id::noise.getParamID()),
-          webNoiseRelay,
-          nullptr
+          juce::WebBrowserComponent::Options {}
+              .withBackend (juce::WebBrowserComponent::Options::Backend::webview2)
+              .withWinWebView2Options (
+                  juce::WebBrowserComponent::Options::WinWebView2 {}
+                      .withBackgroundColour (juce::Colours::white)
+                      .withUserDataFolder (juce::File::getSpecialLocation (
+                          juce::File::SpecialLocationType::tempDirectory)))
+              .withNativeIntegrationEnabled()
+              .withResourceProvider (
+                  [this] (const auto& url) { return getResource (url); },
+                  juce::URL { LOCAL_DEV_SERVER_ADDRESS }.getOrigin())
+              .withInitialisationData ("vendor", JUCE_COMPANY_NAME)
+              .withInitialisationData ("pluginName", JUCE_PRODUCT_NAME)
+              .withInitialisationData ("pluginVersion", JUCE_PRODUCT_VERSION)
+              .withNativeFunction (juce::Identifier { "updateParam" },
+                  [this] (const juce::Array<juce::var>& args,
+                      juce::WebBrowserComponent::NativeFunctionCompletion completion) {
+                      handleParamUpdate (args, std::move (completion));
+                  })
+              .withNativeFunction (juce::Identifier { "loadState" },
+                  [this] (const juce::Array<juce::var>& args,
+                      juce::WebBrowserComponent::NativeFunctionCompletion completion) {
+                      handleLoadState (args, std::move (completion));
+                  })
       }
 {
-    // juce::ignoreUnused (processorRef);
-
     addAndMakeVisible (webView);
-
-    // WebBrowserComponent can display any URL
-    // webView.goToURL("https://juce.com");
-
-    // This is necessary if we want to use a ResourceProvider
-    // webView.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
 
     // This can be used for hot reloading
     webView.goToURL (LOCAL_DEV_SERVER_ADDRESS);
+
+    // This is necessary if we want to use a ResourceProvider
+    // webView.goToURL(juce::WebBrowserComponent::getResourceProviderRoot());
 
 #ifndef JUCE_DEBUG
     // Disable right-click context menu in production builds
     webView.evaluateJavascript ("document.addEventListener('contextmenu', event => event.preventDefault());");
 #endif
 
-    // setResizable (true, true);
+    // setResizable (true, true); (need to update to make UI responsive first)
     setSize (784, 530);
+
+    // Register as listener for all parameters (for DAW automation → JS sync)
+    for (const auto& param : PARAM_SCHEMA)
+    {
+        processorRef.getState().addParameterListener (param.id, this);
+    }
 
     startTimer (60);
 }
 
 PluginEditor::~PluginEditor()
 {
+    for (const auto& param : PARAM_SCHEMA)
+    {
+        processorRef.getState().removeParameterListener (param.id, this);
+    }
 }
 
 void PluginEditor::resized()
 {
-    auto bounds = getBounds();
-    webView.setBounds (bounds);
+    webView.setBounds (getBounds());
 }
 
 void PluginEditor::timerCallback()
@@ -305,11 +150,80 @@ void PluginEditor::timerCallback()
     webView.emitEventIfBrowserIsVisible ("outputLevel", juce::var {});
 }
 
+// JS → C++: updateParam("h1_gain", 0.75)
+void PluginEditor::handleParamUpdate (const juce::Array<juce::var>& args,
+    juce::WebBrowserComponent::NativeFunctionCompletion completion)
+{
+    if (args.size() >= 2)
+    {
+        const juce::String paramId = args[0].toString();
+        const float value = static_cast<float> (args[1]);
+
+        if (auto* param = dynamic_cast<juce::AudioParameterFloat*> (
+                processorRef.getState().getParameter (paramId)))
+        {
+            param->setValueNotifyingHost (
+                param->getNormalisableRange().convertTo0to1 (value));
+        }
+    }
+
+    completion (juce::var {});
+}
+
+// JS → C++: loadState() — returns { schema: [...], values: { "h1_gain": 0.75, ... } }
+void PluginEditor::handleLoadState (const juce::Array<juce::var>& /*args*/,
+    juce::WebBrowserComponent::NativeFunctionCompletion completion)
+{
+    auto* result = new juce::DynamicObject();
+
+    // Build schema array
+    juce::Array<juce::var> schemaArray;
+    for (const auto& p : PARAM_SCHEMA)
+    {
+        auto* entry = new juce::DynamicObject();
+        entry->setProperty ("id", juce::String (p.id));
+        entry->setProperty ("name", juce::String (p.name));
+        entry->setProperty ("min", p.min);
+        entry->setProperty ("max", p.max);
+        entry->setProperty ("default", p.defaultVal);
+        entry->setProperty ("step", p.step);
+        entry->setProperty ("skew", p.skew);
+        schemaArray.add (juce::var (entry));
+    }
+    result->setProperty ("schema", schemaArray);
+
+    // Build current values
+    auto* values = new juce::DynamicObject();
+    for (const auto& p : PARAM_SCHEMA)
+    {
+        if (auto* param = dynamic_cast<juce::AudioParameterFloat*> (
+                processorRef.getState().getParameter (p.id)))
+        {
+            values->setProperty (p.id, static_cast<double> (param->get()));
+        }
+    }
+    result->setProperty ("values", juce::var (values));
+
+    completion (juce::var (result));
+}
+
+// C++ → JS: DAW automation / preset change pushes to webview
+void PluginEditor::parameterChanged (const juce::String& parameterID, float newValue)
+{
+    // parameterChanged can be called from the audio thread, so we need to
+    // bounce to the message thread for the webview call
+    juce::MessageManager::callAsync ([this, parameterID, newValue]() {
+        auto* obj = new juce::DynamicObject();
+        obj->setProperty ("id", parameterID);
+        obj->setProperty ("value", static_cast<double> (newValue));
+        webView.emitEventIfBrowserIsVisible (
+            juce::Identifier { "paramChanged" }, juce::var (obj));
+    });
+}
+
 auto PluginEditor::getResource (const juce::String& url) const
     -> std::optional<Resource>
 {
-    std::cout << "ResourceProvider called with " << url << std::endl;
-
     const auto resourceToRetrieve =
         url == "/" ? "index.html" : url.fromFirstOccurrenceOf ("/", false, false);
 

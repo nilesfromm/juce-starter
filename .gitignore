@@ -29,3 +29,5 @@ cmake-build-release
 cmake-build-relwithdebinfo
 packaging/Output/*
 /build
+/.claude
+/docs/plans
