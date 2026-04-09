@@ -4,6 +4,7 @@ import Harmonics from "./components/Harmonics";
 import Voice from "./components/Voice";
 import "./store/bridge";
 import { useParamStore } from "./store/paramStore";
+import Oscilloscope from "./components/Oscilloscope";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -32,7 +33,9 @@ function App() {
         <div className="col-span-2">
           <Harmonics />
         </div>
-        <div className="col-span-1 bg-blue-600 w-full h-[124px]"></div>
+        <div className="col-span-1 w-full h-[124px]">
+          <Oscilloscope />
+        </div>
       </div>
     </div>
   );
