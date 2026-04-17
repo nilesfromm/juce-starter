@@ -87,27 +87,19 @@ const Oscilloscope = () => {
     // Draw
     ctx.clearRect(0, 0, w, h);
 
-    // Center line (horizontal)
-    ctx.strokeStyle = "rgba(0,0,0,0.25)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, h / 2);
-    ctx.lineTo(w, h / 2);
-    ctx.stroke();
-
     // Waveform
     ctx.strokeStyle = "rgba(0,0,0,0.75)";
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
     ctx.beginPath();
 
-    const padding = 4;
+    const padding = 32;
     const drawH = h - padding * 2;
 
     // Draw from -π to +π so the wave crosses zero at the center
     for (let i = 0; i < samples; i++) {
       const x = i;
-      const t = (i / samples - 0.5) * 8 * Math.PI; // -π to +π
+      const t = (i / samples) * 2 * Math.PI; // -π to +π
       let sample = 0;
       for (const { gain, ratio } of harmonicData) {
         if (gain > 0 && ratio > 0) {
@@ -120,10 +112,12 @@ const Oscilloscope = () => {
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
+
+    ctx.fillStyle = "rgba(200,200,200,1)";
   }, [harmonicData]);
 
   return (
-    <div className="flex size-full overflow-hidden bg-[#D9D9D9]">
+    <div className="flex size-full overflow-hidden">
       <canvas ref={canvasRef} className="size-full" />
     </div>
   );
