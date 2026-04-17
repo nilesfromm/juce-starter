@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Harmonics from "./components/Harmonics";
-import Voice from "./components/Voice";
+import Harmonics from "./components/v1/Harmonics";
+import Voice from "./components/v1/Voice";
 import "./store/bridge";
 import { useParamStore } from "./store/paramStore";
-import Oscilloscope from "./components/Oscilloscope";
+import Oscilloscope from "./components/v1/Oscilloscope";
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -33,7 +33,7 @@ function App() {
         <div className="col-span-2">
           <Harmonics />
         </div>
-        <div className="col-span-1 w-full h-[124px]">
+        <div className="col-span-1 w-full h-[100px]">
           <Oscilloscope />
         </div>
       </div>

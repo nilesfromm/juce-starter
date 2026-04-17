@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { useParamStore } from "../store/paramStore";
+import { useParamStore } from "../../store/paramStore";
 
 interface NumberInputProps {
   label: string;

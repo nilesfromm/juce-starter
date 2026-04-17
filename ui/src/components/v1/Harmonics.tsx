@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useParamStore } from "../store/paramStore";
+import { useParamStore } from "../../store/paramStore";
 
 interface HarmonicProps {
   id: string;
@@ -166,7 +166,7 @@ const Harmonics = () => {
   }, []);
 
   return (
-    <div className="w-full h-[124px] bg-black/10 p-6">
+    <div className="w-full h-[100px] bg-black/10 p-6">
       <div ref={harmonicsWrapperRef} className="relative w-full h-full">
         {HARMONIC_IDS.map((id) => (
           <Harmonic key={id} id={id} harmonicsWrapperBounds={wrapperBounds} />

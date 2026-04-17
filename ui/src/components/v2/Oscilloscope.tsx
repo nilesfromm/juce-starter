@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo } from "react";
-import { useParamStore } from "../store/paramStore";
+import { useParamStore } from "../../store/paramStore";
 
 const Oscilloscope = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
