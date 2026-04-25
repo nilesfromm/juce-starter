@@ -1,7 +1,7 @@
 import { useShallow } from "zustand/react/shallow";
 import NumberInput from "./Input";
 import Envelope from "./Envelope";
-import { useParamStore } from "../../store/paramStore";
+import { useParamStore } from "../store/paramStore";
 
 interface VoiceProps {
   voiceId: string;

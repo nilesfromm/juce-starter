@@ -3,7 +3,6 @@
 #include "PluginProcessor.h"
 #include "parameters/ParameterSchema.h"
 
-#include "melatonin_inspector/melatonin_inspector.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
@@ -32,8 +31,6 @@ private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
     PluginProcessor& processorRef;
-    std::unique_ptr<melatonin::Inspector> inspector;
-
     juce::WebBrowserComponent webView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)

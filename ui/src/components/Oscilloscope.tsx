@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo } from "react";
-import { useParamStore } from "../../store/paramStore";
+import { useParamStore } from "../store/paramStore";
 
 const Oscilloscope = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,7 +93,7 @@ const Oscilloscope = () => {
     ctx.lineJoin = "round";
     ctx.beginPath();
 
-    const padding = 32;
+    const padding = 16;
     const drawH = h - padding * 2;
 
     // Draw from -π to +π so the wave crosses zero at the center

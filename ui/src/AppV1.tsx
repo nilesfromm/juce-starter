@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Harmonics from "./components/v1/Harmonics";
-import Voice from "./components/v1/Voice";
+import Harmonics from "./components/Harmonics";
+import Voice from "./components/Voice";
 import "./store/bridge";
 import { useParamStore } from "./store/paramStore";
-import Oscilloscope from "./components/v1/Oscilloscope";
+import Oscilloscope from "./components/Oscilloscope";
 
 function App() {
   const [ready, setReady] = useState(false);

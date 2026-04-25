@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useParamStore } from "../../store/paramStore";
+import { useParamStore } from "../store/paramStore";
 
 interface HarmonicProps {
   id: string;
